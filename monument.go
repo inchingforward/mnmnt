@@ -1,13 +1,13 @@
 package main
 
 import (
-	"log" 
-	"net/http"
 	"database/sql"
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
 	_ "github.com/lib/pq"
-	"github.com/jmoiron/sqlx"
+	"log"
+	"net/http"
 )
 
 var db *sql.DB
@@ -26,7 +26,7 @@ func getMemories(c echo.Context) error {
 
 func getMemory(c echo.Context) error {
 	id := c.Param("id")
-	return render(c, "FIXME:  get memory " + id)
+	return render(c, "FIXME:  get memory "+id)
 }
 
 func createMemory(c echo.Context) error {
