@@ -3,11 +3,14 @@ package main
 import (
 	"log" 
 	"net/http"
+	"database/sql"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
 	_ "github.com/lib/pq"
 	"github.com/jmoiron/sqlx"
 )
+
+var db *sql.DB
 
 func render(c echo.Context, message string) error {
 	return c.String(http.StatusOK, message)
