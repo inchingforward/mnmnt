@@ -1,9 +1,12 @@
 package main
 
 import (
+	"log" 
 	"net/http"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
+	_ "github.com/lib/pq"
+	"github.com/jmoiron/sqlx"
 )
 
 func render(c echo.Context, message string) error {
@@ -48,6 +51,12 @@ func getAbout(c echo.Context) error {
 }
 
 func main() {
+	db, err := sqlx.Connect("postgres", "user=monument dbname=monument sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
 	e := echo.New()
 
 	e.GET("/", index)
