@@ -1,22 +1,57 @@
 package main
 
 import (
-	"database/sql"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
 	_ "github.com/lib/pq"
 	"log"
 	"net/http"
+	"time"
 )
 
-var db *sql.DB
+var db *sqlx.DB
+
+type Memory struct {
+	Id           uint64     `db:"id"`
+	Title        string     `db:"title"`
+	Details      string     `db:"details"`
+	Latitude     float64    `db:"latitude"`
+	Longitude    float64    `db:"longitude"`
+	Author       string     `db:"author"`
+	IsApproved   bool       `db:"is_approved"`
+	ApprovalUuid string     `db:"approval_uuid"`
+	InsertedAt   time.Time  `db:"inserted_at"`
+	UpdatedAt    time.Time  `db:"updated_at"`
+}
+
+func init() {
+	var err error
+	
+	db, err = sqlx.Connect("postgres", "user=monument dbname=monument sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func render(c echo.Context, message string) error {
 	return c.String(http.StatusOK, message)
 }
 
 func index(c echo.Context) error {
+	log.Println("About to query...")
+	
+	var memories []*Memory
+	err := db.Select(&memories, "select * from memory")
+
+	if err == nil {
+		log.Println("err was nil...first memory:")
+		log.Println(memories)
+	} else {
+		log.Println("there was an error")
+		log.Println(err)
+	}
+
 	return render(c, "I am a fresh start for the Monument web app.")
 }
 
@@ -54,11 +89,11 @@ func getAbout(c echo.Context) error {
 }
 
 func main() {
-	db, err := sqlx.Connect("postgres", "user=monument dbname=monument sslmode=disable")
+	/*db, err := sqlx.Connect("postgres", "user=monument dbname=monument sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
+	defer db.Close()*/
 
 	e := echo.New()
 
