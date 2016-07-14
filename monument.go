@@ -112,6 +112,7 @@ func main() {
 
 	e.SetRenderer(t)
 
+	e.Static("/static", "static")
 	e.GET("/", index)
 	e.GET("/memories", getMemories)
 	e.GET("/memories/:id", getMemory)
@@ -122,5 +123,6 @@ func main() {
 	e.GET("/memories/add", getAddMemory)
 	e.GET("/about", getAbout)
 
+	log.Println("Listening...")
 	e.Run(standard.New(":4000"))
 }
