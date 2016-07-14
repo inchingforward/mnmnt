@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
@@ -39,20 +40,23 @@ func render(c echo.Context, message string) error {
 }
 
 func index(c echo.Context) error {
-	log.Println("About to query...")
-	
 	var memories []*Memory
 	err := db.Select(&memories, "select * from memory")
 
 	if err == nil {
-		log.Println("err was nil...first memory:")
-		log.Println(memories)
+		var buffer bytes.Buffer
+		
+		buffer.WriteString("Memories:\n\n")
+		
+		for _, mem := range memories {
+			buffer.WriteString(mem.Title)
+			buffer.WriteString("\n")
+		}
+		
+		return render(c, buffer.String())
 	} else {
-		log.Println("there was an error")
-		log.Println(err)
+		return render(c, err.Error())
 	}
-
-	return render(c, "I am a fresh start for the Monument web app.")
 }
 
 func getMemories(c echo.Context) error {
