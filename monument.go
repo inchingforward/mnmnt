@@ -2,16 +2,23 @@ package main
 
 import (
 	"bytes"
+	"database/sql"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
 	_ "github.com/lib/pq"
+	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"time"
 )
 
 var db *sqlx.DB
+
+type Template struct {
+	templates *template.Template
+}
 
 type Memory struct {
 	Id           uint64     `db:"id"`
@@ -21,7 +28,7 @@ type Memory struct {
 	Longitude    float64    `db:"longitude"`
 	Author       string     `db:"author"`
 	IsApproved   bool       `db:"is_approved"`
-	ApprovalUuid string     `db:"approval_uuid"`
+	ApprovalUuid sql.NullString     `db:"approval_uuid"`
 	InsertedAt   time.Time  `db:"inserted_at"`
 	UpdatedAt    time.Time  `db:"updated_at"`
 }
@@ -39,6 +46,10 @@ func render(c echo.Context, message string) error {
 	return c.String(http.StatusOK, message)
 }
 
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
+}
+
 func index(c echo.Context) error {
 	var memories []*Memory
 	err := db.Select(&memories, "select * from memory")
@@ -53,7 +64,7 @@ func index(c echo.Context) error {
 			buffer.WriteString("\n")
 		}
 		
-		return render(c, buffer.String())
+		return c.Render(http.StatusOK, "index.html", memories)
 	} else {
 		return render(c, err.Error())
 	}
@@ -93,13 +104,13 @@ func getAbout(c echo.Context) error {
 }
 
 func main() {
-	/*db, err := sqlx.Connect("postgres", "user=monument dbname=monument sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()*/
-
 	e := echo.New()
+
+	t := &Template{
+		templates: template.Must(template.ParseGlob("templates/*.html")),
+	}
+
+	e.SetRenderer(t)
 
 	e.GET("/", index)
 	e.GET("/memories", getMemories)

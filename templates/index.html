@@ -1,0 +1,9 @@
+{{ template "layout_header.html" }}
+
+<ul>
+{{ range . }}
+	<li>{{ .Title }}</li>
+{{ end }}
+</ul>
+
+{{ template "layout_footer.html" }}
