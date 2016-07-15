@@ -1,9 +1,12 @@
 {{ template "layout_header.html" }}
+<div id="map">
 
-<ul>
-{{ range . }}
-	<li>{{ .Title }}</li>
-{{ end }}
-</ul>
-
+</div>
+<div id="map_memories">
+	<ul>
+	{{ range . }}
+		<li>{{ .Title }}</li>
+	{{ end }}
+	</ul>
+</div>
 {{ template "layout_footer.html" }}

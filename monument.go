@@ -60,7 +60,7 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 
 func index(c echo.Context) error {
 	var memories []*Memory
-	err := db.Select(&memories, "select * from memory")
+	err := db.Select(&memories, "select * from memory order by id desc limit 5")
 
 	if err == nil {
 		return c.Render(http.StatusOK, "index.html", memories)

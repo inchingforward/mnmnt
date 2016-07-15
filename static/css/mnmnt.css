@@ -1,0 +1,25 @@
+body {
+	font: 24px;
+}
+
+#main {
+	min-height: 400px;
+	display: flex;
+	flex-flow: row;
+	align-items: flex-start;
+	justify-content: center;
+}
+
+#map {
+	margin: auto;
+	height: 100%;
+	border: 1px solid #ccc;
+	flex: 2;
+	flex-grow: 2;
+}
+
+#map_memories {
+	margin: auto;
+	flex: 1;
+	flex-grow: 1;
+}
