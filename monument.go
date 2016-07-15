@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"database/sql"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
@@ -11,10 +10,15 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
-var db *sqlx.DB
+var (
+	db *sqlx.DB
+	t *Template
+	debug = false
+)
 
 type Template struct {
 	templates *template.Template
@@ -47,6 +51,10 @@ func render(c echo.Context, message string) error {
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	if debug {
+		t.templates = template.Must(template.ParseGlob("templates/*.html"))
+	}
+	
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
@@ -55,15 +63,6 @@ func index(c echo.Context) error {
 	err := db.Select(&memories, "select * from memory")
 
 	if err == nil {
-		var buffer bytes.Buffer
-		
-		buffer.WriteString("Memories:\n\n")
-		
-		for _, mem := range memories {
-			buffer.WriteString(mem.Title)
-			buffer.WriteString("\n")
-		}
-		
 		return c.Render(http.StatusOK, "index.html", memories)
 	} else {
 		return render(c, err.Error())
@@ -106,10 +105,16 @@ func getAbout(c echo.Context) error {
 func main() {
 	e := echo.New()
 
-	t := &Template{
+	t = &Template{
 		templates: template.Must(template.ParseGlob("templates/*.html")),
 	}
-
+	
+	if len(os.Args) > 1 && os.Args[1] == "debug" {
+		debug = true
+	}
+	
+	log.Printf("debug: %v\n", debug)
+	
 	e.SetRenderer(t)
 
 	e.Static("/static", "static")
