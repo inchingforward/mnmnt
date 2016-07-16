@@ -15,8 +15,8 @@ import (
 )
 
 var (
-	db *sqlx.DB
-	t *Template
+	db    *sqlx.DB
+	t     *Template
 	debug = false
 )
 
@@ -25,21 +25,21 @@ type Template struct {
 }
 
 type Memory struct {
-	Id           uint64     `db:"id"`
-	Title        string     `db:"title"`
-	Details      string     `db:"details"`
-	Latitude     float64    `db:"latitude"`
-	Longitude    float64    `db:"longitude"`
-	Author       string     `db:"author"`
-	IsApproved   bool       `db:"is_approved"`
-	ApprovalUuid sql.NullString     `db:"approval_uuid"`
-	InsertedAt   time.Time  `db:"inserted_at"`
-	UpdatedAt    time.Time  `db:"updated_at"`
+	Id           uint64         `db:"id"`
+	Title        string         `db:"title"`
+	Details      string         `db:"details"`
+	Latitude     float64        `db:"latitude"`
+	Longitude    float64        `db:"longitude"`
+	Author       string         `db:"author"`
+	IsApproved   bool           `db:"is_approved"`
+	ApprovalUuid sql.NullString `db:"approval_uuid"`
+	InsertedAt   time.Time      `db:"inserted_at"`
+	UpdatedAt    time.Time      `db:"updated_at"`
 }
 
 func init() {
 	var err error
-	
+
 	db, err = sqlx.Connect("postgres", "user=monument dbname=monument sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -54,7 +54,7 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 	if debug {
 		t.templates = template.Must(template.ParseGlob("templates/*.html"))
 	}
-	
+
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
@@ -108,13 +108,13 @@ func main() {
 	t = &Template{
 		templates: template.Must(template.ParseGlob("templates/*.html")),
 	}
-	
+
 	if len(os.Args) > 1 && os.Args[1] == "debug" {
 		debug = true
 	}
-	
+
 	log.Printf("debug: %v\n", debug)
-	
+
 	e.SetRenderer(t)
 
 	e.Static("/static", "static")
