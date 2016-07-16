@@ -29,8 +29,8 @@ a {
 #map {
 	height: 500px;
 	border: 1px solid #ccc;
-	flex: 2 2 auto;
-	-webkit-flex: 2 2 auto;
+	flex: 3 3 auto;
+	-webkit-flex: 3 3 auto;
 	align-content: stretch;
 	-webkit-align-content: stretch;
 }
