@@ -1,25 +1,48 @@
 body {
-	font: 24px;
+	font-size: 24px;
+}
+
+header {
+  margin-bottom: 20px;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a {
+  text-decoration: none;
 }
 
 #main {
 	min-height: 400px;
 	display: flex;
+	display: -webkit-flex;
 	flex-flow: row;
-	align-items: flex-start;
+	-webkit-flex-flow: row;
+	align-items: stretch;
+	-webkit-align-items: stretch;
 	justify-content: center;
+	-webkit-justify-content: center;
 }
 
 #map {
-	margin: auto;
-	height: 100%;
+	height: 500px;
 	border: 1px solid #ccc;
-	flex: 2;
-	flex-grow: 2;
+	flex: 2 2 auto;
+	-webkit-flex: 2 2 auto;
+	align-content: stretch;
+	-webkit-align-content: stretch;
 }
 
 #map_memories {
-	margin: auto;
-	flex: 1;
-	flex-grow: 1;
+	flex: 1 1 auto;
+	-webkit-flex: 1 1 auto;
+	align-content: stretch;
+	-webkit-align-content: stretch;
+}
+
+#map_memories > ul {
+  list-style: none;
+  margin-left: 0;
 }

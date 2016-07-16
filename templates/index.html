@@ -5,8 +5,52 @@
 <div id="map_memories">
 	<ul>
 	{{ range . }}
-		<li>{{ .Title }}</li>
+		<li><a href="/memories/{{ .Id }}">{{ .Title }}</a></li>
 	{{ end }}
 	</ul>
 </div>
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-L9zdn5nktdMgJ6PROzjMaOwP0dJ2HN8"></script>
+<script>
+(function() {
+    var mapOptions = {
+        center: { lat: 38.677811 , lng:  -90.419197 },
+        zoom: 13
+    };
+    
+    var infoWindow = new google.maps.InfoWindow();
+    var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+    var bounds = new google.maps.LatLngBounds();
+
+	function addMemory(latitude, longitude, memoryId, memoryTitle) {
+	    var latLng = new google.maps.LatLng(latitude, longitude);
+	    
+	    bounds.extend(latLng);
+	    
+	    var marker = new google.maps.Marker({
+	        position: latLng,
+	        map: map,
+	        title: memoryTitle
+	    });
+	    
+	    marker.addListener("mouseover", function() {
+	        var that = this;
+            showInfoWindow(that, memoryId, memoryTitle);
+	    });
+	    
+        map.fitBounds(bounds);        
+	}
+	
+	function showInfoWindow(marker, memoryId, memoryTitle) {
+	    var content = '<a href="/memories/' + memoryId + '">' + memoryTitle + '</a>'
+
+	    infoWindow.setContent(content);
+	    infoWindow.open(map, marker);
+	}
+	
+	{{ range . }}
+	    addMemory({{ .Latitude }}, {{ .Longitude }}, "{{ .Id }}", "{{ .Title }}");
+	{{ end }}
+})();
+</script>
 {{ template "layout_footer.html" }}
