@@ -1,0 +1,31 @@
+{{ template "layout_header.html" }}
+
+<div id="memory_map"></div>
+
+<div id="memory_details">
+  <h2>{{ .Title }}</h2>
+  <h3>{{ .Author }}</h3>
+    
+  <p>{{ .Details }}</p>
+  
+  <h5>Submitted {{ .InsertedAt.Format "01/02/2006 03:04 pm" }}</h5>
+</div>
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-L9zdn5nktdMgJ6PROzjMaOwP0dJ2HN8"></script>
+<script>
+(function() {
+    var mapOptions = {
+      center: { lat: {{ .Latitude }}, lng: {{ .Longitude }}},
+      zoom: 13
+    };
+    
+    var map = new google.maps.Map(document.getElementById("memory_map"), mapOptions);
+    
+    new google.maps.Marker({
+        position: {lat: {{ .Latitude }}, lng: {{ .Longitude }}}, 
+        map: map, 
+        title: "{{ .Title }}"
+      });
+})();
+</script>
+{{ template "layout_footer.html" }}

@@ -1,5 +1,7 @@
-body {
-	font-size: 24px;
+html { 
+  font-family: Georgia, serif; 
+  line-height: 1.4em; 
+  color: #666; 
 }
 
 header {
@@ -14,7 +16,12 @@ a {
   text-decoration: none;
 }
 
-#main {
+h1 { font-weight: 400; color: #333; }
+h2 { font-weight: 400; color: #333; }
+h3 { font-weight: 400; color: #333; }
+h5 { font-weight: 400; color: #ccc; }
+
+#index {
 	min-height: 400px;
 	display: flex;
 	display: -webkit-flex;
@@ -46,3 +53,28 @@ a {
   list-style: none;
   margin-left: 0;
 }
+
+#memory {
+  min-height: 400px;
+	display: flex;
+	display: -webkit-flex;
+	flex-flow: column;
+	-webkit-flex-flow: column;
+	align-items: stretch;
+	-webkit-align-items: stretch;
+	justify-content: center;
+	-webkit-justify-content: center;
+}
+
+#memory_map {
+	height: 200px;
+	border: 1px solid #ccc;
+	flex: 3 3 auto;
+	-webkit-flex: 3 3 auto;
+	align-content: stretch;
+	-webkit-align-content: stretch;
+}
+
+#memory_details h2 { padding-top: 20px; margin-bottom: 5px; }
+#memory_details h3 { color: #ccc; margin-top: 0; }
+#memory_details p { font-weight: none; line-height: 1.4em; }

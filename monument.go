@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -74,8 +75,19 @@ func getMemories(c echo.Context) error {
 }
 
 func getMemory(c echo.Context) error {
-	id := c.Param("id")
-	return render(c, "FIXME:  get memory "+id)
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return render(c, err.Error())
+	}	
+
+	memory := Memory{}
+	err = db.Get(&memory, "select * from memory where id = $1", id)
+	
+	if err == nil {
+		return c.Render(http.StatusOK, "memory.html", memory)
+	} else {
+		return render(c, err.Error())
+	}
 }
 
 func createMemory(c echo.Context) error {
