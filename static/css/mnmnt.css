@@ -78,3 +78,5 @@ h5 { font-weight: 400; color: #ccc; }
 #memory_details h2 { padding-top: 20px; margin-bottom: 5px; }
 #memory_details h3 { color: #ccc; margin-top: 0; }
 #memory_details p { font-weight: none; line-height: 1.4em; }
+
+#about { width: 600px; margin: auto; }

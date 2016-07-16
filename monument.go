@@ -111,7 +111,7 @@ func getAddMemory(c echo.Context) error {
 }
 
 func getAbout(c echo.Context) error {
-	return render(c, "FIXME:  get about")
+	return c.Render(http.StatusOK, "about.html", nil)
 }
 
 func main() {
