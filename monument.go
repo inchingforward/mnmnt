@@ -47,8 +47,19 @@ func init() {
 	}
 }
 
-func render(c echo.Context, message string) error {
+func renderFixMe(c echo.Context, message string) error {
 	return c.String(http.StatusOK, message)
+}
+
+func render(c echo.Context, templ string, data interface{}, err error) error {
+	if err == nil {
+		return c.Render(http.StatusOK, templ, data)
+	} else if err == sql.ErrNoRows {
+		return c.Render(http.StatusNotFound, "404.html", nil)
+	} else {
+		log.Println(err)
+		return c.Render(http.StatusInternalServerError, "500.html", nil)
+	}
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
@@ -63,51 +74,43 @@ func index(c echo.Context) error {
 	var memories []*Memory
 	err := db.Select(&memories, "select * from memory order by id desc limit 5")
 
-	if err == nil {
-		return c.Render(http.StatusOK, "index.html", memories)
-	} else {
-		return render(c, err.Error())
-	}
+	return render(c, "index.html", memories, err)
 }
 
 func getMemories(c echo.Context) error {
-	return render(c, "FIXME:  render list of memories")
+	return renderFixMe(c, "FIXME:  render list of memories")
 }
 
 func getMemory(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return render(c, err.Error())
+		return renderFixMe(c, err.Error())
 	}	
 
 	memory := Memory{}
 	err = db.Get(&memory, "select * from memory where id = $1", id)
 	
-	if err == nil {
-		return c.Render(http.StatusOK, "memory.html", memory)
-	} else {
-		return render(c, err.Error())
-	}
+	return render(c, "memory.html", memory, err)
 }
 
 func createMemory(c echo.Context) error {
-	return render(c, "FIXME:  create memory")
+	return renderFixMe(c, "FIXME:  create memory")
 }
 
 func updateMemory(c echo.Context) error {
-	return render(c, "FIXME:  update memory")
+	return renderFixMe(c, "FIXME:  update memory")
 }
 
 func getMemorySubmitted(c echo.Context) error {
-	return render(c, "FIXME:  get memory submitted")
+	return renderFixMe(c, "FIXME:  get memory submitted")
 }
 
 func approveMemory(c echo.Context) error {
-	return render(c, "FIXME:  approve memory")
+	return renderFixMe(c, "FIXME:  approve memory")
 }
 
 func getAddMemory(c echo.Context) error {
-	return render(c, "FIXME:  get add memory")
+	return renderFixMe(c, "FIXME:  get add memory")
 }
 
 func getAbout(c echo.Context) error {
