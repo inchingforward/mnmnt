@@ -2,10 +2,12 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
 	_ "github.com/lib/pq"
+	"github.com/russross/blackfriday"
 	"html/template"
 	"io"
 	"log"
@@ -64,7 +66,11 @@ func render(c echo.Context, templ string, data interface{}, err error) error {
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	if debug {
-		t.templates = template.Must(template.ParseGlob("templates/*.html"))
+		funcMap := template.FuncMap {
+			"mdb": markDownBasic,
+		}
+
+		t.templates = template.Must(template.New("main").Funcs(funcMap).ParseGlob("templates/*.html"))
 	}
 
 	return t.templates.ExecuteTemplate(w, name, data)
@@ -117,11 +123,20 @@ func getAbout(c echo.Context) error {
 	return c.Render(http.StatusOK, "about.html", nil)
 }
 
+func markDownBasic(args ...interface{}) template.HTML {
+    s := blackfriday.MarkdownCommon([]byte(fmt.Sprintf("%s", args...)))
+    return template.HTML(s)
+}
+
 func main() {
 	e := echo.New()
 
+	funcMap := template.FuncMap {
+		"mdb": markDownBasic,
+	}
+
 	t = &Template{
-		templates: template.Must(template.ParseGlob("templates/*.html")),
+		templates: template.Must(template.New("main").Funcs(funcMap).ParseGlob("templates/*.html")),
 	}
 
 	if len(os.Args) > 1 && os.Args[1] == "debug" {
