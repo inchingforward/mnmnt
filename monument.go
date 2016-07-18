@@ -3,11 +3,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/jmoiron/sqlx"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/engine/standard"
-	_ "github.com/lib/pq"
-	"github.com/russross/blackfriday"
 	"html/template"
 	"io"
 	"log"
@@ -15,6 +10,12 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/engine/standard"
+	_ "github.com/lib/pq"
+	"github.com/russross/blackfriday"
 )
 
 var (
@@ -66,7 +67,7 @@ func render(c echo.Context, templ string, data interface{}, err error) error {
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	if debug {
-		funcMap := template.FuncMap {
+		funcMap := template.FuncMap{
 			"mdb": markDownBasic,
 		}
 
@@ -91,11 +92,11 @@ func getMemory(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return renderFixMe(c, err.Error())
-	}	
+	}
 
 	memory := Memory{}
 	err = db.Get(&memory, "select * from memory where id = $1", id)
-	
+
 	return render(c, "memory.html", memory, err)
 }
 
@@ -124,14 +125,14 @@ func getAbout(c echo.Context) error {
 }
 
 func markDownBasic(args ...interface{}) template.HTML {
-    s := blackfriday.MarkdownCommon([]byte(fmt.Sprintf("%s", args...)))
-    return template.HTML(s)
+	s := blackfriday.MarkdownCommon([]byte(fmt.Sprintf("%s", args...)))
+	return template.HTML(s)
 }
 
 func main() {
 	e := echo.New()
 
-	funcMap := template.FuncMap {
+	funcMap := template.FuncMap{
 		"mdb": markDownBasic,
 	}
 
