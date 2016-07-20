@@ -85,3 +85,13 @@ h5 { font-weight: 400; color: #ccc; }
 #memory_details p { font-weight: none; line-height: 1.4em; }
 
 #info { width: 600px; margin: auto; }
+
+#all_memories { width: 600px; }
+#all_memories td,th { padding: 5px; }
+#all_memories th { text-align: left; }
+#all_memories th:nth-child(2), td:nth-child(2) {
+  text-align: right;
+}
+#all_memories tr:nth-child(2n-1) td {
+    background-color: #f9f9f9;
+}

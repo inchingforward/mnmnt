@@ -85,7 +85,10 @@ func index(c echo.Context) error {
 }
 
 func getMemories(c echo.Context) error {
-	return renderFixMe(c, "FIXME:  render list of memories")
+	var memories []*Memory
+	err := db.Select(&memories, "select * from memory order by id desc")
+
+	return render(c, "memories.html", memories, err)
 }
 
 func getMemory(c echo.Context) error {

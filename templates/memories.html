@@ -1,0 +1,19 @@
+{{ template "layout_header.html" }}
+<h2> All Memories</h2>
+<table id="all_memories">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Submitted</th>
+        </tr>
+    </thead>
+    <tbody>
+    {{ range . }}
+        <tr>
+            <td><a href="/memories/{{ .Id }}">{{ .Title }}</a></td>
+            <td>{{ .InsertedAt.Format "01/02/2006 03:04 pm" }}</td>
+        </tr>
+    {{ end }}
+    </tbody>
+</table>
+{{ template "layout_footer.html" }}
