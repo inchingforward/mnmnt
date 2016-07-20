@@ -79,14 +79,14 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 
 func index(c echo.Context) error {
 	var memories []*Memory
-	err := db.Select(&memories, "select * from memory order by id desc limit 5")
+	err := db.Select(&memories, "select * from memory where is_approved = true order by id desc limit 5")
 
 	return render(c, "index.html", memories, err)
 }
 
 func getMemories(c echo.Context) error {
 	var memories []*Memory
-	err := db.Select(&memories, "select * from memory order by id desc")
+	err := db.Select(&memories, "select * from memory where is_approved = true order by id desc")
 
 	return render(c, "memories.html", memories, err)
 }
