@@ -112,7 +112,7 @@ func updateMemory(c echo.Context) error {
 }
 
 func getMemorySubmitted(c echo.Context) error {
-	return renderFixMe(c, "FIXME:  get memory submitted")
+	return render(c, "memory_submitted.html", nil, nil)
 }
 
 func approveMemory(c echo.Context) error {
