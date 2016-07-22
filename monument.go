@@ -120,7 +120,7 @@ func approveMemory(c echo.Context) error {
 }
 
 func getAddMemory(c echo.Context) error {
-	return renderFixMe(c, "FIXME:  get add memory")
+	return render(c, "memory_new.html", nil, nil)
 }
 
 func getAbout(c echo.Context) error {
