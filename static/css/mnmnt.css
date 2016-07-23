@@ -95,3 +95,13 @@ h5 { font-weight: 400; color: #ccc; }
 #all_memories tr:nth-child(2n-1) td {
     background-color: #f9f9f9;
 }
+
+/* Memory Form */
+#address_search_map { width: 100%; height: 200px; padding: 5px; }
+#add_memory { width: 600px; margin: auto; }
+#add_memory h2 { display:inline; }
+#add_memory form { padding-top: 20px; }
+#add_memory input { width: 100%; padding: 5px; margin-bottom: 10px; }
+#add_memory textarea { width: 100%; height: 200px; padding: 5px; border: 1px solid #ccc; }
+#add_memory input[type=submit] { font-size: 1.3em; padding: 5px; }
+#add_memory ul { list-style-type: none; padding-left: 0; }

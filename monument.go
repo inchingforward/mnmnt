@@ -120,7 +120,7 @@ func approveMemory(c echo.Context) error {
 }
 
 func getAddMemory(c echo.Context) error {
-	return render(c, "memory_new.html", nil, nil)
+	return render(c, "memory_form.html", nil, nil)
 }
 
 func getAbout(c echo.Context) error {

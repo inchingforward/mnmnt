@@ -1,0 +1,29 @@
+{{ template "layout_header.html" }}
+
+<div id="add_memory">
+    <h2>Add a memory </h2><i id="map_spinner" class="fa fa-spinner fa-spin" style="display:none;"></i>
+    <form method="post" action="/memories" onsubmit="return verifyForm();">
+        <div id="address_search">
+          <input type="text" id="address_text" name="address_text" value="" placeholder="1. Enter an address." onenter="findAddress();" />
+          <div id="address_search_map"></div>
+        </div>
+
+        <!-- errors here -->
+    
+        <input type="hidden" id="latitude" name="latitude" value="" />
+        <input type="hidden" id="longitude" name="longitude" value="" />
+        <input type="hidden" name="_csrf_token" value="">
+
+        <ul>
+            <li><input type="text" id="title" name="title" placeholder="2. Enter a title." value="" /></li>
+            <li><textarea id="details" name="details" placeholder="3. Enter your memory.  Separate paragraphs with a blank line."></textarea></li>
+
+            <li><input type="text" id="author" name="author" placeholder="4. Enter your name (optional).  If left blank, 'Anonymous' will be used." value="" /></li>
+        </ul>
+        <input type="submit" id="submit_button" value="Submit" disabled="disabled" />
+    </form>
+</div>
+
+{{ template "js.html" }}
+<script src="/static/js/memory_form.js"></script>
+{{ template "layout_footer.html" }}
