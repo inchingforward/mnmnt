@@ -29,12 +29,12 @@ type Template struct {
 }
 
 type Memory struct {
-	Id           uint64         `db:"id"`
-	Title        string         `db:"title"`
-	Details      string         `db:"details"`
-	Latitude     float64        `db:"latitude"`
-	Longitude    float64        `db:"longitude"`
-	Author       string         `db:"author"`
+	Id           uint64         `db:"id" form:"id"`
+	Title        string         `db:"title" form:"title"`
+	Details      string         `db:"details" form:"details"`
+	Latitude     float64        `db:"latitude" form:"latitude"`
+	Longitude    float64        `db:"longitude" form:"longitude"`
+	Author       string         `db:"author" form:"author"`
 	IsApproved   bool           `db:"is_approved"`
 	ApprovalUuid sql.NullString `db:"approval_uuid"`
 	InsertedAt   time.Time      `db:"inserted_at"`
@@ -104,7 +104,18 @@ func getMemory(c echo.Context) error {
 }
 
 func createMemory(c echo.Context) error {
-	return renderFixMe(c, "FIXME:  create memory")
+	m := new(Memory)
+	if err := c.Bind(m); err != nil {
+		return err
+	}
+
+	_, err := db.NamedExec("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, null, now(), now())", m)
+	if err != nil {
+		return render(c, "memory.html", m, err)
+	} else {
+		// FIXME:  send approval email
+		return render(c, "memory_submitted.html", m, err)
+	}
 }
 
 func updateMemory(c echo.Context) error {
