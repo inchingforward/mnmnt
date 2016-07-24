@@ -13,47 +13,47 @@ var RecentMemories = RecentMemories || (function() {
         markerAndContent = {};
     }
 
-	function addMemory(latitude, longitude, memoryId, memoryTitle) {
-	    var latLng = new google.maps.LatLng(latitude, longitude);
-	    
-	    bounds.extend(latLng);
-	    
-	    var marker = new google.maps.Marker({
-	        position: latLng,
-	        map: map,
-	        title: memoryTitle
-	    });
-	    
-	    marker.addListener("mouseover", function() {
-	        var that = this;
+    function addMemory(latitude, longitude, memoryId, memoryTitle) {
+        var latLng = new google.maps.LatLng(latitude, longitude);
+
+        bounds.extend(latLng);
+
+        var marker = new google.maps.Marker({
+            position: latLng,
+            map: map,
+            title: memoryTitle
+        });
+
+        marker.addListener("mouseover", function() {
+            var that = this;
             showInfoWindowForId(memoryId);
-	    });
+        });
 
-	    cacheMarkerAndContent(memoryId, marker, memoryTitle);
-	    
+        cacheMarkerAndContent(memoryId, marker, memoryTitle);
+
         map.fitBounds(bounds);        
-	}
+    }
 
-	function cacheMarkerAndContent(memoryId, marker, content) {
-		markerAndContent[memoryId] = {
-			marker: marker,
-			content: content
-		}
-	}
-	
-	function showInfoWindowForId(memoryId) {
-		var mc = markerAndContent[memoryId];
-	    var content = '<a href="/memories/' + memoryId + '">' + mc.content + '</a>'
+    function cacheMarkerAndContent(memoryId, marker, content) {
+        markerAndContent[memoryId] = {
+            marker: marker,
+            content: content
+        }
+    }
 
-	    infoWindow.setContent(content);
-	    infoWindow.open(map, mc.marker);
-	}
+    function showInfoWindowForId(memoryId) {
+        var mc = markerAndContent[memoryId];
+        var content = '<a href="/memories/' + memoryId + '">' + mc.content + '</a>'
 
-	return {
-		showInfoWindowForId: showInfoWindowForId,
-		addMemory: addMemory, 
-		init: init
-	}
+        infoWindow.setContent(content);
+        infoWindow.open(map, mc.marker);
+    }
+
+    return {
+        showInfoWindowForId: showInfoWindowForId,
+        addMemory: addMemory, 
+        init: init
+    }
 })();
 
 var AddMemory = AddMemory || (function() {
@@ -72,13 +72,13 @@ var AddMemory = AddMemory || (function() {
             center: { lat: 38.6272222, lng: -90.1977778},
             zoom: 13
         };
-        
+
         map = new google.maps.Map(document.getElementById('address_search_map'), mapOptions);
-        
+
         $("#address_text").keyup(function() {
             delay(findAddress, 1500);
         });
-      
+
         $("#address_text").keypress(function (e) {
             if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
                 findAddress();
@@ -96,33 +96,33 @@ var AddMemory = AddMemory || (function() {
         if (marker) {
             marker.setMap(null);
         }
-        
+
         var latitude = $("#latitude");
         var longitude = $("#longitude");
         var submitButton = $("#submit_button");
         var geocoder = new google.maps.Geocoder();
-        
+
         $("#map_spinner").show();
-        
+
         geocoder.geocode({address: addressText}, function(results, status) {
             $("#map_spinner").hide();
-            
+
             if (status == google.maps.GeocoderStatus.OK) {
                 map.setCenter(results[0].geometry.location);
-                
+
                 marker = new google.maps.Marker({
                     map: map,
                     position: results[0].geometry.location
                 });
-                
+
                 latitude.val(results[0].geometry.location.lat());
                 longitude.val(results[0].geometry.location.lng());
-                
+
                 submitButton.attr("disabled", false);
             } else {
                 latitude.val("");
                 longitude.val("");
-                
+
                 submitButton.attr("disabled", "disabled");
             }
         });
@@ -131,27 +131,27 @@ var AddMemory = AddMemory || (function() {
     function verifyForm() {
         var latitude = $("#latitude").val();
         var longitude = $("#longitude").val();
-        
+
         if (!latitude || !longitude) {
             alert("Please search and find an address.");
             $("#address_text").focus();
             return false;
         }
-        
+
         var titleField = $("#title");
         if (!titleField.val()) {
             alert("Please enter a title.");
             titleField.focus();
             return false;
         }
-        
+
         var detailsField = $("#details");
         if (!detailsField.val()) {
             alert("Please enter some details.");
             detailsField.focus();
             return false;
         }
-        
+
         return true;
     }
 
@@ -175,7 +175,7 @@ var MemoryDetails = MemoryDetails || (function() {
             title: title
         });
     }
-    
+
     return {
         showMap: showMap
     }
