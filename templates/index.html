@@ -12,60 +12,9 @@
 
 {{ template "js.html" }}
 <script>
-var RecentMemories = (function() {
-    var mapOptions = {
-        center: { lat: 38.677811 , lng:  -90.419197 },
-        zoom: 13
-    };
-    
-    var infoWindow = new google.maps.InfoWindow();
-    var map = new google.maps.Map(document.getElementById("map"), mapOptions);
-    var bounds = new google.maps.LatLngBounds();
-    var markerAndContent = {};
-
-	function addMemory(latitude, longitude, memoryId, memoryTitle) {
-	    var latLng = new google.maps.LatLng(latitude, longitude);
-	    
-	    bounds.extend(latLng);
-	    
-	    var marker = new google.maps.Marker({
-	        position: latLng,
-	        map: map,
-	        title: memoryTitle
-	    });
-	    
-	    marker.addListener("mouseover", function() {
-	        var that = this;
-            showInfoWindowForId(memoryId);
-	    });
-
-	    cacheMarkerAndContent(memoryId, marker, memoryTitle);
-	    
-        map.fitBounds(bounds);        
-	}
-
-	function cacheMarkerAndContent(memoryId, marker, content) {
-		markerAndContent[memoryId] = {
-			marker: marker,
-			content: content
-		}
-	}
-	
-	function showInfoWindowForId(memoryId) {
-		var mc = markerAndContent[memoryId];
-	    var content = '<a href="/memories/' + memoryId + '">' + mc.content + '</a>'
-
-	    infoWindow.setContent(content);
-	    infoWindow.open(map, mc.marker);
-	}
-	
-	{{ range . }}
-	    addMemory({{ .Latitude }}, {{ .Longitude }}, "{{ .Id }}", "{{ .Title }}");
-	{{ end }}
-
-	return {
-		showInfoWindowForId: showInfoWindowForId
-	}
-})();
+    RecentMemories.init();
+{{ range . }}
+    RecentMemories.addMemory({{ .Latitude }}, {{ .Longitude }}, "{{ .Id }}", "{{ .Title }}");
+{{ end }}
 </script>
 {{ template "layout_footer.html" }}
