@@ -5,17 +5,13 @@ html {
   padding: 10px;
 }
 
-header {
-  margin-bottom: 20px;
-}
+header { margin-bottom: 10px; margin-top: 0; }
+header a { margin-top: 0; margin-right: 10px; font-size: 1em;}
+.home { margin-right: 40px; }
 
-a:hover {
-  text-decoration: underline;
-}
+a:hover { text-decoration: underline; }
 
-a {
-  text-decoration: none;
-}
+a { text-decoration: none; }
 
 h1 { font-weight: 400; color: #333; }
 h2 { font-weight: 400; color: #333; }
