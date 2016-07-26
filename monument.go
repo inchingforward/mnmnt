@@ -16,6 +16,7 @@ import (
 	"github.com/labstack/echo/engine/standard"
 	_ "github.com/lib/pq"
 	"github.com/russross/blackfriday"
+	"github.com/satori/go.uuid"
 )
 
 var (
@@ -29,16 +30,16 @@ type Template struct {
 }
 
 type Memory struct {
-	Id           uint64         `db:"id" form:"id"`
-	Title        string         `db:"title" form:"title"`
-	Details      string         `db:"details" form:"details"`
-	Latitude     float64        `db:"latitude" form:"latitude"`
-	Longitude    float64        `db:"longitude" form:"longitude"`
-	Author       string         `db:"author" form:"author"`
-	IsApproved   bool           `db:"is_approved"`
-	ApprovalUuid sql.NullString `db:"approval_uuid"`
-	InsertedAt   time.Time      `db:"inserted_at"`
-	UpdatedAt    time.Time      `db:"updated_at"`
+	Id           uint64    `db:"id" form:"id"`
+	Title        string    `db:"title" form:"title"`
+	Details      string    `db:"details" form:"details"`
+	Latitude     float64   `db:"latitude" form:"latitude"`
+	Longitude    float64   `db:"longitude" form:"longitude"`
+	Author       string    `db:"author" form:"author"`
+	IsApproved   bool      `db:"is_approved"`
+	ApprovalUuid string    `db:"approval_uuid"`
+	InsertedAt   time.Time `db:"inserted_at"`
+	UpdatedAt    time.Time `db:"updated_at"`
 }
 
 func init() {
@@ -109,17 +110,15 @@ func createMemory(c echo.Context) error {
 		return err
 	}
 
-	_, err := db.NamedExec("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, null, now(), now())", m)
+	m.ApprovalUuid = uuid.NewV4().String()
+
+	_, err := db.NamedExec("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now())", m)
 	if err != nil {
 		return render(c, "memory.html", m, err)
 	} else {
 		// FIXME:  send approval email
 		return render(c, "memory_submitted.html", m, err)
 	}
-}
-
-func updateMemory(c echo.Context) error {
-	return renderFixMe(c, "FIXME:  update memory")
 }
 
 func getMemorySubmitted(c echo.Context) error {
@@ -167,7 +166,6 @@ func main() {
 	e.GET("/memories", getMemories)
 	e.GET("/memories/:id", getMemory)
 	e.POST("/memories", createMemory)
-	e.PUT("/memories", updateMemory)
 	e.GET("/memories/submitted", getMemorySubmitted)
 	e.GET("/memories/approve/:uuid", approveMemory)
 	e.GET("/memories/add", getAddMemory)
