@@ -126,7 +126,25 @@ func getMemorySubmitted(c echo.Context) error {
 }
 
 func approveMemory(c echo.Context) error {
-	return renderFixMe(c, "FIXME:  approve memory")
+	uuid := c.Param("uuid")
+
+	if uuid == "" {
+		return c.Render(http.StatusBadRequest, "message.html", "Missing UUID")
+	}
+
+	memory := Memory{}
+	err := db.Get(&memory, "select * from memory where is_approved = false and approval_uuid = $1", uuid)
+
+	if err != nil {
+		return render(c, "", nil, err)
+	}
+
+	_, err = db.NamedExec("update memory set is_approved = true where id = :id", memory)
+	if err != nil {
+		return render(c, "", memory, err)
+	}
+
+	return render(c, "memory_approved.html", memory, nil)
 }
 
 func getAddMemory(c echo.Context) error {
