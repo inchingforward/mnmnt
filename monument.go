@@ -51,8 +51,8 @@ func init() {
 	}
 }
 
-func renderFixMe(c echo.Context, message string) error {
-	return c.String(http.StatusOK, message)
+func renderMessage(c echo.Context, status int, message string) error {
+	return c.Render(status, "message.html", message)
 }
 
 func render(c echo.Context, templ string, data interface{}, err error) error {
@@ -95,7 +95,7 @@ func getMemories(c echo.Context) error {
 func getMemory(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return renderFixMe(c, err.Error())
+		return renderMessage(c, http.StatusBadRequest, fmt.Sprintf("Invalid id: '%v'", c.Param("id")))
 	}
 
 	memory := Memory{}
