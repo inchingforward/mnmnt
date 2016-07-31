@@ -165,6 +165,7 @@ func tweet(memory *Memory) {
 	accessTokenSecret := os.Getenv("MONUMENT_TWITTER_ACCESS_SECRET")
 
 	if mnmntHost == "" || consumerKey == "" || consumerSecret == "" || accessToken == "" || accessTokenSecret == "" {
+		log.Println("Missing mail environment variables...not tweeting")
 		return
 	}
 
