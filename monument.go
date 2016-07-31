@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/ChimeraCoder/anaconda"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
@@ -113,12 +114,22 @@ func createMemory(c echo.Context) error {
 
 	m.ApprovalUuid = uuid.NewV4().String()
 
-	_, err := db.NamedExec("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now())", m)
+	rows, err := db.NamedQuery("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now()) returning id", m)
+	if err != nil {
+		return render(c, "memory.html", m, err)
+	}
+
+	if !rows.Next() {
+		return render(c, "memory.html", m, rows.Err())
+	}
+
+	err = rows.Scan(&m.Id)
 	if err != nil {
 		return render(c, "memory.html", m, err)
 	}
 
 	sendEmail(m)
+	tweet(m)
 
 	return render(c, "memory_submitted.html", m, err)
 }
@@ -144,6 +155,28 @@ func sendEmail(memory *Memory) {
 
 	response, id, err := gun.Send(msg)
 	log.Printf("mailer response: %v, message: %v, error: %v\n", id, response, err)
+}
+
+func tweet(memory *Memory) {
+	mnmntHost := os.Getenv("MONUMENT_HOST")
+	consumerKey := os.Getenv("MONUMENT_TWITTER_CONSUMER_KEY")
+	consumerSecret := os.Getenv("MONUMENT_TWITTER_CONSUMER_SECRET")
+	accessToken := os.Getenv("MONUMENT_TWITTER_ACCESS_TOKEN")
+	accessTokenSecret := os.Getenv("MONUMENT_TWITTER_ACCESS_SECRET")
+
+	if mnmntHost == "" || consumerKey == "" || consumerSecret == "" || accessToken == "" || accessTokenSecret == "" {
+		return
+	}
+
+	anaconda.SetConsumerKey(consumerKey)
+	anaconda.SetConsumerSecret(consumerSecret)
+
+	api := anaconda.NewTwitterApi(accessToken, accessTokenSecret)
+
+	body := fmt.Sprintf("%v %v/memories/%v", memory.Title, mnmntHost, memory.Id)
+
+	tweet, err := api.PostTweet(body, nil)
+	log.Printf("twitter result id: %v, error: %v\n", tweet.Id, err)
 }
 
 func getMemorySubmitted(c echo.Context) error {
