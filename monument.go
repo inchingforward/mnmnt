@@ -80,6 +80,25 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
+func namedInsert(query string, arg interface{}) (uint64, error) {
+	rows, err := db.NamedQuery(query, arg)
+	if err != nil {
+		return 0, err
+	}
+
+	if !rows.Next() {
+		return 0, rows.Err()
+	}
+
+	var id uint64
+	err = rows.Scan(&id)
+	if err != nil {
+		return 0, err
+	}	
+
+	return id, nil
+}
+
 func index(c echo.Context) error {
 	var memories []*Memory
 	err := db.Select(&memories, "select * from memory where is_approved = true order by id desc limit 5")
@@ -114,19 +133,14 @@ func createMemory(c echo.Context) error {
 
 	m.ApprovalUuid = uuid.NewV4().String()
 
-	rows, err := db.NamedQuery("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now()) returning id", m)
+	id, err := namedInsert("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now()) returning id", m)
 	if err != nil {
 		return render(c, "memory.html", m, err)
 	}
 
-	if !rows.Next() {
-		return render(c, "memory.html", m, rows.Err())
-	}
+	log.Printf("New memory \"%v\" (id: %v) created.\n", m.Title, id)
 
-	err = rows.Scan(&m.Id)
-	if err != nil {
-		return render(c, "memory.html", m, err)
-	}
+	m.Id = id
 
 	sendEmail(m)
 	tweet(m)
