@@ -131,6 +131,10 @@ func createMemory(c echo.Context) error {
 		return err
 	}
 
+	if m.Author == "" {
+		m.Author = "Anonymous"
+	}
+
 	m.ApprovalUuid = uuid.NewV4().String()
 
 	id, err := namedInsert("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now()) returning id", m)
