@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/ChimeraCoder/anaconda"
+	"github.com/inchingforward/mnmnt/models"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
@@ -22,7 +22,6 @@ import (
 )
 
 var (
-	db    *sqlx.DB
 	t     *Template
 	debug = false
 )
@@ -31,23 +30,10 @@ type Template struct {
 	templates *template.Template
 }
 
-type Memory struct {
-	Id           uint64    `db:"id" form:"id"`
-	Title        string    `db:"title" form:"title"`
-	Details      string    `db:"details" form:"details"`
-	Latitude     float64   `db:"latitude" form:"latitude"`
-	Longitude    float64   `db:"longitude" form:"longitude"`
-	Author       string    `db:"author" form:"author"`
-	IsApproved   bool      `db:"is_approved"`
-	ApprovalUuid string    `db:"approval_uuid"`
-	InsertedAt   time.Time `db:"inserted_at"`
-	UpdatedAt    time.Time `db:"updated_at"`
-}
-
 func init() {
 	var err error
 
-	db, err = sqlx.Connect("postgres", "user=monument dbname=monument sslmode=disable")
+	models.DB, err = sqlx.Connect("postgres", "user=monument dbname=monument sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,35 +66,14 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
-func namedInsert(query string, arg interface{}) (uint64, error) {
-	rows, err := db.NamedQuery(query, arg)
-	if err != nil {
-		return 0, err
-	}
-
-	if !rows.Next() {
-		return 0, rows.Err()
-	}
-
-	var id uint64
-	err = rows.Scan(&id)
-	if err != nil {
-		return 0, err
-	}	
-
-	return id, nil
-}
-
 func index(c echo.Context) error {
-	var memories []*Memory
-	err := db.Select(&memories, "select * from memory where is_approved = true order by id desc limit 5")
+	memories, err := models.GetRecentMemories()
 
 	return render(c, "index.html", memories, err)
 }
 
 func getMemories(c echo.Context) error {
-	var memories []*Memory
-	err := db.Select(&memories, "select * from memory where is_approved = true order by id desc")
+	memories, err := models.GetAllMemories()
 
 	return render(c, "memories.html", memories, err)
 }
@@ -119,14 +84,13 @@ func getMemory(c echo.Context) error {
 		return renderMessage(c, http.StatusBadRequest, fmt.Sprintf("Invalid id: '%v'", c.Param("id")))
 	}
 
-	memory := Memory{}
-	err = db.Get(&memory, "select * from memory where id = $1", id)
+	memory, err := models.GetMemory(id)
 
 	return render(c, "memory.html", memory, err)
 }
 
 func createMemory(c echo.Context) error {
-	m := new(Memory)
+	m := new(models.Memory)
 	if err := c.Bind(m); err != nil {
 		return err
 	}
@@ -137,7 +101,7 @@ func createMemory(c echo.Context) error {
 
 	m.ApprovalUuid = uuid.NewV4().String()
 
-	id, err := namedInsert("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now()) returning id", m)
+	id, err := models.AddMemory(m)
 	if err != nil {
 		return render(c, "memory.html", m, err)
 	}
@@ -152,7 +116,7 @@ func createMemory(c echo.Context) error {
 	return render(c, "memory_submitted.html", m, err)
 }
 
-func sendEmail(memory *Memory) {
+func sendEmail(memory *models.Memory) {
 	domain := os.Getenv("MONUMENT_MAILGUN_DOMAIN")
 	prvKey := os.Getenv("MONUMENT_MAILGUN_PRIVATE_KEY")
 	pubKey := os.Getenv("MONUMENT_MAILGUN_PUBLIC_KEY")
@@ -175,7 +139,7 @@ func sendEmail(memory *Memory) {
 	log.Printf("mailer response: %v, message: %v, error: %v\n", id, response, err)
 }
 
-func tweet(memory *Memory) {
+func tweet(memory *models.Memory) {
 	mnmntHost := os.Getenv("MONUMENT_HOST")
 	consumerKey := os.Getenv("MONUMENT_TWITTER_CONSUMER_KEY")
 	consumerSecret := os.Getenv("MONUMENT_TWITTER_CONSUMER_SECRET")
@@ -209,14 +173,12 @@ func approveMemory(c echo.Context) error {
 		return c.Render(http.StatusBadRequest, "message.html", "Missing UUID")
 	}
 
-	memory := Memory{}
-	err := db.Get(&memory, "select * from memory where is_approved = false and approval_uuid = $1", uuid)
-
+	memory, err := models.GetMemoryByUuid(uuid)
 	if err != nil {
 		return render(c, "", nil, err)
 	}
 
-	_, err = db.NamedExec("update memory set is_approved = true where id = :id", memory)
+	models.ApproveMemory(memory)
 	if err != nil {
 		return render(c, "", memory, err)
 	}
