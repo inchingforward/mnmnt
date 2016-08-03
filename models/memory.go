@@ -35,7 +35,7 @@ func NamedInsert(query string, arg interface{}) (uint64, error) {
 	err = rows.Scan(&id)
 	if err != nil {
 		return 0, err
-	}	
+	}
 
 	return id, nil
 }
@@ -51,14 +51,14 @@ func GetRecentMemories() ([]*Memory, error) {
 func GetAllMemories() ([]*Memory, error) {
 	var memories []*Memory
 
-	err := DB.Select(&memories, "select * from memory where is_approved = true order by id desc")	
+	err := DB.Select(&memories, "select * from memory where is_approved = true order by id desc")
 
 	return memories, err
 }
 
 func GetMemory(id int) (Memory, error) {
 	memory := Memory{}
-	
+
 	err := DB.Get(&memory, "select * from memory where id = $1", id)
 
 	return memory, err
@@ -78,6 +78,6 @@ func AddMemory(memory *Memory) (uint64, error) {
 
 func ApproveMemory(memory Memory) error {
 	_, err := DB.NamedExec("update memory set is_approved = true where id = :id", memory)
-	
+
 	return err
 }

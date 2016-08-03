@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	
+
 	"github.com/inchingforward/mnmnt/models"
 	"github.com/mailgun/mailgun-go"
 )
