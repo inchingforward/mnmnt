@@ -9,7 +9,7 @@ import (
 	"github.com/inchingforward/mnmnt/models"
 )
 
-func Tweet(memory *models.Memory) {
+func Tweet(memory models.Memory) {
 	mnmntHost := os.Getenv("MONUMENT_HOST")
 	consumerKey := os.Getenv("MONUMENT_TWITTER_CONSUMER_KEY")
 	consumerSecret := os.Getenv("MONUMENT_TWITTER_CONSUMER_SECRET")

@@ -72,7 +72,7 @@ func GetMemoryByUuid(uuid string) (Memory, error) {
 	return memory, err
 }
 
-func AddMemory(memory *Memory) (uint64, error) {
+func AddMemory(memory Memory) (uint64, error) {
 	return NamedInsert("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now()) returning id", memory)
 }
 

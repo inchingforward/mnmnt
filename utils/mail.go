@@ -9,7 +9,7 @@ import (
 	"github.com/mailgun/mailgun-go"
 )
 
-func SendEmail(memory *models.Memory) {
+func SendEmail(memory models.Memory) {
 	domain := os.Getenv("MONUMENT_MAILGUN_DOMAIN")
 	prvKey := os.Getenv("MONUMENT_MAILGUN_PRIVATE_KEY")
 	pubKey := os.Getenv("MONUMENT_MAILGUN_PUBLIC_KEY")

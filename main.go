@@ -89,7 +89,7 @@ func getMemory(c echo.Context) error {
 }
 
 func createMemory(c echo.Context) error {
-	m := new(models.Memory)
+	m := models.Memory{}
 	if err := c.Bind(m); err != nil {
 		return err
 	}
