@@ -17,7 +17,6 @@ import (
 	"github.com/labstack/echo/engine/standard"
 	_ "github.com/lib/pq"
 	"github.com/russross/blackfriday"
-	"github.com/satori/go.uuid"
 )
 
 var (
@@ -49,7 +48,7 @@ func render(c echo.Context, templ string, data interface{}, err error) error {
 		return c.Render(http.StatusNotFound, "404.html", nil)
 	} else {
 		log.Println(err)
-		return c.Render(http.StatusInternalServerError, "500.html", nil)
+		return c.Render(http.StatusInternalServerError, "500.html", err)
 	}
 }
 
@@ -90,24 +89,14 @@ func getMemory(c echo.Context) error {
 
 func createMemory(c echo.Context) error {
 	m := models.Memory{}
-	if err := c.Bind(m); err != nil {
-		return err
-	}
-
-	if m.Author == "" {
-		m.Author = "Anonymous"
-	}
-
-	m.ApprovalUuid = uuid.NewV4().String()
-
-	id, err := models.AddMemory(m)
-	if err != nil {
+	if err := c.Bind(&m); err != nil {
 		return render(c, "memory.html", m, err)
 	}
 
-	log.Printf("New memory \"%v\" (id: %v) created.\n", m.Title, id)
-
-	m.Id = id
+	err := models.AddMemory(&m)
+	if err != nil {
+		return render(c, "memory.html", m, err)
+	}
 
 	utils.SendEmail(m)
 	utils.Tweet(m)

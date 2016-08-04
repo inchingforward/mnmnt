@@ -1,9 +1,12 @@
 package models
 
 import (
+	"errors"
+	"log"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/satori/go.uuid"
 )
 
 var DB *sqlx.DB
@@ -72,8 +75,35 @@ func GetMemoryByUuid(uuid string) (Memory, error) {
 	return memory, err
 }
 
-func AddMemory(memory Memory) (uint64, error) {
-	return NamedInsert("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now()) returning id", memory)
+func AddMemory(memory *Memory) error {
+	if memory.Title == "" {
+		return errors.New("A Title is required.")
+	}
+
+	if memory.Details == "" {
+		return errors.New("Memory details are required.")
+	}
+
+	if memory.Latitude == 0 && memory.Longitude == 0 {
+		return errors.New("A valid memory location is required.")
+	}
+	
+	if memory.Author == "" {
+		memory.Author = "Anonymous"
+	}
+
+	memory.ApprovalUuid = uuid.NewV4().String()
+
+	id, err := NamedInsert("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now()) returning id", memory)
+	if err != nil {
+		return err
+	}
+
+	memory.Id = id
+
+	log.Printf("New memory \"%v\" (id: %v) created.\n", memory.Title, memory.Id)
+
+	return nil
 }
 
 func ApproveMemory(memory Memory) error {
