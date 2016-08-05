@@ -18,6 +18,8 @@ h2 { font-weight: 400; color: #333; }
 h3 { font-weight: 400; color: #333; }
 h5 { font-weight: 400; color: #ccc; }
 
+.error { color: #dd3333; }
+
 #index {
 	min-height: 400px;
 	display: flex;

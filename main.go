@@ -28,6 +28,11 @@ type Template struct {
 	templates *template.Template
 }
 
+type TemplateContext struct {
+	Data interface{}
+	Err  error
+}
+
 func init() {
 	var err error
 
@@ -50,6 +55,10 @@ func render(c echo.Context, templ string, data interface{}, err error) error {
 		log.Println(err)
 		return c.Render(http.StatusInternalServerError, "500.html", err)
 	}
+}
+
+func renderContext(c echo.Context, templ string, ctx TemplateContext) error {
+	return c.Render(http.StatusOK, templ, ctx)
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
@@ -95,7 +104,7 @@ func createMemory(c echo.Context) error {
 
 	err := models.AddMemory(&m)
 	if err != nil {
-		return render(c, "memory.html", m, err)
+		return renderContext(c, "memory_form.html", TemplateContext{c.FormParams(), err})
 	}
 
 	utils.SendEmail(m)

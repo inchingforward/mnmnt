@@ -156,7 +156,8 @@ var AddMemory = AddMemory || (function() {
     }
 
     return {
-        init: init
+        init: init,
+        findAddress: findAddress
     }
 })();
 
