@@ -29,7 +29,7 @@ type Template struct {
 	templates *template.Template
 }
 
-// A TemplateContext is data and error holder that is passed in to a
+// A TemplateContext holds data and an error that are passed in to a
 // template for rendering.  Either Data or Err can be nil.
 type TemplateContext struct {
 	Data interface{}
