@@ -10,8 +10,8 @@ import (
 )
 
 // Tweet tweets out the title of the given memory along with a link
-// to memory details page.  If any Twitter-related environment variables
-// are not set, no tweet is attempted.
+// to the memory's details page.  If any Twitter-related environment
+// variables are not set, no tweet is attempted.
 func Tweet(memory models.Memory) {
 	mnmntHost := os.Getenv("MONUMENT_HOST")
 	consumerKey := os.Getenv("MONUMENT_TWITTER_CONSUMER_KEY")
