@@ -9,6 +9,10 @@ import (
 	"github.com/mailgun/mailgun-go"
 )
 
+// SendEmail sends a "New Monument memory submitted" email along with an
+// approval link.  The email is sent to the recipients in defined in the
+// MONUMENT_ADMIN_EMAIL environment variable.  If any mail-related
+// environment variable is not set, no email is sent.
 func SendEmail(memory models.Memory) {
 	domain := os.Getenv("MONUMENT_MAILGUN_DOMAIN")
 	prvKey := os.Getenv("MONUMENT_MAILGUN_PRIVATE_KEY")
