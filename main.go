@@ -45,11 +45,14 @@ func init() {
 	}
 }
 
-func renderMessage(c echo.Context, status int, message string) error {
+// RenderMessage displays message using the message.html template.
+func RenderMessage(c echo.Context, status int, message string) error {
 	return c.Render(status, "message.html", message)
 }
 
-func render(c echo.Context, templ string, data interface{}, err error) error {
+// Render will render the given templ template passing in data if err
+// is nil, or will render a 404 or 500 error page depending on the err.
+func Render(c echo.Context, templ string, data interface{}, err error) error {
 	if err == nil {
 		return c.Render(http.StatusOK, templ, data)
 	} else if err == sql.ErrNoRows {
@@ -60,7 +63,9 @@ func render(c echo.Context, templ string, data interface{}, err error) error {
 	}
 }
 
-func renderContext(c echo.Context, templ string, ctx TemplateContext) error {
+// RenderContext will render the given templ template passing in the ctx
+// TemplateContext.
+func RenderContext(c echo.Context, templ string, ctx TemplateContext) error {
 	return c.Render(http.StatusOK, templ, ctx)
 }
 
@@ -70,7 +75,7 @@ func renderContext(c echo.Context, templ string, ctx TemplateContext) error {
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	if debug {
 		funcMap := template.FuncMap{
-			"mdb": markDownBasic,
+			"mdb": MarkDownBasic,
 		}
 
 		t.templates = template.Must(template.New("main").Funcs(funcMap).ParseGlob("templates/*.html"))
@@ -79,51 +84,58 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
-func index(c echo.Context) error {
+// Index renders the home page.
+func Index(c echo.Context) error {
 	memories, err := models.GetRecentMemories()
 
-	return render(c, "index.html", memories, err)
+	return Render(c, "index.html", memories, err)
 }
 
-func getMemories(c echo.Context) error {
+// GetMemories renders all approved memories.
+func GetMemories(c echo.Context) error {
 	memories, err := models.GetAllMemories()
 
-	return render(c, "memories.html", memories, err)
+	return Render(c, "memories.html", memories, err)
 }
 
-func getMemory(c echo.Context) error {
+// GetMemory renders the memory details page for the corresponding
+// memory id parameter.
+func GetMemory(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return renderMessage(c, http.StatusBadRequest, fmt.Sprintf("Invalid id: '%v'", c.Param("id")))
+		return RenderMessage(c, http.StatusBadRequest, fmt.Sprintf("Invalid id: '%v'", c.Param("id")))
 	}
 
 	memory, err := models.GetMemory(id)
 
-	return render(c, "memory.html", memory, err)
+	return Render(c, "memory.html", memory, err)
 }
 
-func createMemory(c echo.Context) error {
+// CreateMemory creates a new Memory using values from a submitted form.
+func CreateMemory(c echo.Context) error {
 	m := models.Memory{}
 	if err := c.Bind(&m); err != nil {
-		return render(c, "memory.html", m, err)
+		return Render(c, "memory.html", m, err)
 	}
 
 	err := models.AddMemory(&m)
 	if err != nil {
-		return renderContext(c, "memory_form.html", TemplateContext{c.FormParams(), err})
+		return RenderContext(c, "memory_form.html", TemplateContext{c.FormParams(), err})
 	}
 
 	utils.SendEmail(m)
 	utils.Tweet(m)
 
-	return render(c, "memory_submitted.html", m, err)
+	return Render(c, "memory_submitted.html", m, err)
 }
 
-func getMemorySubmitted(c echo.Context) error {
-	return render(c, "memory_submitted.html", nil, nil)
+// GetMemorySubmitted renders the memory submitted success page.
+func GetMemorySubmitted(c echo.Context) error {
+	return Render(c, "memory_submitted.html", nil, nil)
 }
 
-func approveMemory(c echo.Context) error {
+// ApproveMemory approves the Memory corresponding to the uuid parameter.
+func ApproveMemory(c echo.Context) error {
 	uuid := c.Param("uuid")
 
 	if uuid == "" {
@@ -132,26 +144,29 @@ func approveMemory(c echo.Context) error {
 
 	memory, err := models.GetMemoryByUuid(uuid)
 	if err != nil {
-		return render(c, "", nil, err)
+		return Render(c, "", nil, err)
 	}
 
 	models.ApproveMemory(memory)
 	if err != nil {
-		return render(c, "", memory, err)
+		return Render(c, "", memory, err)
 	}
 
-	return render(c, "memory_approved.html", memory, nil)
+	return Render(c, "memory_approved.html", memory, nil)
 }
 
-func getAddMemory(c echo.Context) error {
-	return render(c, "memory_form.html", nil, nil)
+// GetAddMemory renders the create memory form.
+func GetAddMemory(c echo.Context) error {
+	return Render(c, "memory_form.html", nil, nil)
 }
 
-func getAbout(c echo.Context) error {
+// GetAbout renders the About page.
+func GetAbout(c echo.Context) error {
 	return c.Render(http.StatusOK, "about.html", nil)
 }
 
-func markDownBasic(args ...interface{}) template.HTML {
+// MarkDownBasic passes the given data to the MarkdownBasic formatter.
+func MarkDownBasic(args ...interface{}) template.HTML {
 	s := blackfriday.MarkdownBasic([]byte(fmt.Sprintf("%s", args...)))
 	return template.HTML(s)
 }
@@ -160,7 +175,7 @@ func main() {
 	e := echo.New()
 
 	funcMap := template.FuncMap{
-		"mdb": markDownBasic,
+		"mdb": MarkDownBasic,
 	}
 
 	t = &Template{
@@ -176,14 +191,14 @@ func main() {
 	e.SetRenderer(t)
 
 	e.Static("/static", "static")
-	e.GET("/", index)
-	e.GET("/memories", getMemories)
-	e.GET("/memories/:id", getMemory)
-	e.POST("/memories", createMemory)
-	e.GET("/memories/submitted", getMemorySubmitted)
-	e.GET("/memories/approve/:uuid", approveMemory)
-	e.GET("/memories/add", getAddMemory)
-	e.GET("/about", getAbout)
+	e.GET("/", Index)
+	e.GET("/memories", GetMemories)
+	e.GET("/memories/:id", GetMemory)
+	e.POST("/memories", CreateMemory)
+	e.GET("/memories/submitted", GetMemorySubmitted)
+	e.GET("/memories/approve/:uuid", ApproveMemory)
+	e.GET("/memories/add", GetAddMemory)
+	e.GET("/about", GetAbout)
 
 	log.Println("Listening...")
 	e.Run(standard.New(":4000"))
