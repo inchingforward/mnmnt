@@ -24,10 +24,13 @@ var (
 	debug = false
 )
 
+// Template represents the parsed templates from the "templates" directory.
 type Template struct {
 	templates *template.Template
 }
 
+// A TemplateContext is data and error holder that is passed in to a
+// template for rendering.  Either Data or Err can be nil.
 type TemplateContext struct {
 	Data interface{}
 	Err  error
@@ -61,6 +64,9 @@ func renderContext(c echo.Context, templ string, ctx TemplateContext) error {
 	return c.Render(http.StatusOK, templ, ctx)
 }
 
+// Render renders the template referenced by name and passes the data value
+// into the template.  If main was run with the debug argument, the templates
+// are re-parsed on each call to Render.
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	if debug {
 		funcMap := template.FuncMap{
