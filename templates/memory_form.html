@@ -9,19 +9,19 @@
 
     <form method="post" action="/memories" onsubmit="return verifyForm();">
         <div id="address_search">
-          <input type="text" id="address_text" name="address_text" value="{{ index .Data.address_text 0 }}" placeholder="1. Search for a place or address." onenter="findAddress();" />
+          <input type="text" id="address_text" name="address_text" value="{{ if .Data }}{{ index .Data.address_text 0 }}{{ end }}" placeholder="1. Search for a place or address." onenter="findAddress();" />
           <div id="address_search_map"></div>
         </div>
         
-        <input type="hidden" id="latitude" name="latitude" value="{{ index .Data.latitude 0 }}" />
-        <input type="hidden" id="longitude" name="longitude" value="{{ index .Data.longitude 0 }}" />
+        <input type="hidden" id="latitude" name="latitude" value="{{ if .Data }}{{ index .Data.latitude 0 }}{{ end }}" />
+        <input type="hidden" id="longitude" name="longitude" value="{{ if .Data }}{{ index .Data.longitude 0 }}{{ end }}" />
         <input type="hidden" name="_csrf_token" value="">
 
         <ul>
-            <li><input type="text" id="title" name="title" placeholder="2. Enter a title." value="{{ index .Data.title 0 }}" /></li>
-            <li><textarea id="details" name="details" placeholder="3. Enter your memory.  Separate paragraphs with a blank line.">{{ index .Data.details 0 }}</textarea></li>
+            <li><input type="text" id="title" name="title" placeholder="2. Enter a title." value="{{ if .Data }}{{ index .Data.title 0 }}{{ end }}" /></li>
+            <li><textarea id="details" name="details" placeholder="3. Enter your memory.  Separate paragraphs with a blank line.">{{ if .Data }}{{ index .Data.details 0 }}{{ end }}</textarea></li>
 
-            <li><input type="text" id="author" name="author" placeholder="4. Enter your name (optional).  If left blank, 'Anonymous' will be used." value="{{ index .Data.author 0 }}" /></li>
+            <li><input type="text" id="author" name="author" placeholder="4. Enter your name (optional).  If left blank, 'Anonymous' will be used." value="{{ if .Data }}{{ index .Data.author 0 }}{{ end }}" /></li>
         </ul>
         <input type="submit" id="submit_button" value="Submit" disabled="disabled" />
     </form>
@@ -31,8 +31,10 @@
 <script>
 AddMemory.init();
 
+{{ if .Data }}
 {{ if index .Data.address_text 0 }}
     AddMemory.findAddress();
 {{ end}}
+{{ end }}
 </script>
 {{ template "layout_footer.html" }}
