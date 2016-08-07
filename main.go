@@ -2,12 +2,12 @@ package main
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 	"html/template"
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/inchingforward/mnmnt/models"
@@ -182,9 +182,8 @@ func main() {
 		templates: template.Must(template.New("main").Funcs(funcMap).ParseGlob("templates/*.html")),
 	}
 
-	if len(os.Args) > 1 && os.Args[1] == "debug" {
-		debug = true
-	}
+	flag.BoolVar(&debug, "debug", false, "true to enable debug")
+	flag.Parse()
 
 	log.Printf("debug: %v\n", debug)
 
