@@ -11,15 +11,16 @@ import (
 
 var DB *sqlx.DB
 
+// A Memory represents a single memory that is tied to a location.
 type Memory struct {
-	Id           uint64    `db:"id" form:"id"`
+	ID           uint64    `db:"id" form:"id"`
 	Title        string    `db:"title" form:"title"`
 	Details      string    `db:"details" form:"details"`
 	Latitude     float64   `db:"latitude" form:"latitude"`
 	Longitude    float64   `db:"longitude" form:"longitude"`
 	Author       string    `db:"author" form:"author"`
 	IsApproved   bool      `db:"is_approved"`
-	ApprovalUuid string    `db:"approval_uuid"`
+	ApprovalUUID string    `db:"approval_uuid"`
 	InsertedAt   time.Time `db:"inserted_at"`
 	UpdatedAt    time.Time `db:"updated_at"`
 }
@@ -87,21 +88,21 @@ func AddMemory(memory *Memory) error {
 	if memory.Latitude == 0 && memory.Longitude == 0 {
 		return errors.New("A valid memory location is required.")
 	}
-	
+
 	if memory.Author == "" {
 		memory.Author = "Anonymous"
 	}
 
-	memory.ApprovalUuid = uuid.NewV4().String()
+	memory.ApprovalUUID = uuid.NewV4().String()
 
 	id, err := NamedInsert("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now()) returning id", memory)
 	if err != nil {
 		return err
 	}
 
-	memory.Id = id
+	memory.ID = id
 
-	log.Printf("New memory \"%v\" (id: %v) created.\n", memory.Title, memory.Id)
+	log.Printf("New memory \"%v\" (id: %v) created.\n", memory.Title, memory.ID)
 
 	return nil
 }
