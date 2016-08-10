@@ -29,7 +29,7 @@ func Tweet(memory models.Memory) {
 
 	api := anaconda.NewTwitterApi(accessToken, accessTokenSecret)
 
-	body := fmt.Sprintf("%v %v/memories/%v", memory.Title, mnmntHost, memory.Id)
+	body := fmt.Sprintf("%v %v/memories/%v", memory.Title, mnmntHost, memory.ID)
 
 	tweet, err := api.PostTweet(body, nil)
 	log.Printf("twitter result id: %v, error: %v\n", tweet.Id, err)

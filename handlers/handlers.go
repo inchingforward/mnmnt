@@ -109,7 +109,7 @@ func ApproveMemory(c echo.Context) error {
 		return c.Render(http.StatusBadRequest, "message.html", "Missing UUID")
 	}
 
-	memory, err := models.GetMemoryByUuid(uuid)
+	memory, err := models.GetMemoryByUUID(uuid)
 	if err != nil {
 		return Render(c, "", nil, err)
 	}

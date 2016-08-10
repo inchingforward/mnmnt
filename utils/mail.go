@@ -25,7 +25,7 @@ func SendEmail(memory models.Memory) {
 		return
 	}
 
-	approvalLink := fmt.Sprintf("%v/memories/approve/%v", mnmntHost, memory.ApprovalUuid)
+	approvalLink := fmt.Sprintf("%v/memories/approve/%v", mnmntHost, memory.ApprovalUUID)
 	subject := "New Monument memory submitted"
 	body := fmt.Sprintf("%v:\n\n%v\n\n-%v\n\nApproval link: %v", memory.Title, memory.Details, memory.Author, approvalLink)
 
