@@ -22,6 +22,7 @@ type Memory struct {
 	Author       string    `db:"author" form:"author"`
 	IsApproved   bool      `db:"is_approved"`
 	ApprovalUUID string    `db:"approval_uuid"`
+	EditUUID     string    `db:"edit_uuid"`
 	InsertedAt   time.Time `db:"inserted_at"`
 	UpdatedAt    time.Time `db:"updated_at"`
 }
@@ -74,6 +75,15 @@ func GetMemory(id int) (Memory, error) {
 	return memory, err
 }
 
+// GetMemoryByEditUUID returns an individual memory by its edit UUID.
+func GetMemoryByEditUUID(uuid string) (Memory, error) {
+	memory := Memory{}
+
+	err := DB.Get(&memory, "select * from memory where is_approved = true and edit_uuid = $1", uuid)
+
+	return memory, err
+}
+
 // GetMemoryByUUID returns an indiviual memory by its approval UUID.
 func GetMemoryByUUID(uuid string) (Memory, error) {
 	memory := Memory{}
@@ -102,8 +112,9 @@ func AddMemory(memory *Memory) error {
 	}
 
 	memory.ApprovalUUID = uuid.NewV4().String()
+	memory.EditUUID = uuid.NewV4().String()
 
-	id, err := NamedInsert("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now()) returning id", memory)
+	id, err := NamedInsert("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now(), :edit_uuid) returning id", memory)
 	if err != nil {
 		return err
 	}

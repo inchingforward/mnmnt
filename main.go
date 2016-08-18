@@ -69,6 +69,7 @@ func main() {
 	e.Static("/static", "static")
 	e.GET("/", handlers.Index)
 	e.GET("/memories", handlers.GetMemories)
+	e.GET("/memories/:uuid/edit", handlers.GetEditMemory)
 	e.GET("/memories/:id", handlers.GetMemory)
 	e.POST("/memories", handlers.CreateMemory)
 	e.GET("/memories/submitted", handlers.GetMemorySubmitted)

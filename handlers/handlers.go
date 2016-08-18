@@ -78,6 +78,22 @@ func GetMemory(c echo.Context) error {
 	return Render(c, "memory.html", memory, err)
 }
 
+// GetEditMemory renders the memory form using the memory
+// for the given uuid parameter.
+func GetEditMemory(c echo.Context) error {
+	uuid := c.Param("uuid")
+	if uuid == "" {
+		return RenderMessage(c, http.StatusBadRequest, fmt.Sprintf("Missing uuid"))
+	}
+
+	memory, err := models.GetMemoryByEditUUID(uuid)
+	if err == sql.ErrNoRows {
+		return c.Render(http.StatusNotFound, "404.html", nil)
+	}
+
+	return Render(c, "memory_form.html", memory, err)
+}
+
 // CreateMemory creates a new Memory using values from a submitted form.
 func CreateMemory(c echo.Context) error {
 	m := models.Memory{}
