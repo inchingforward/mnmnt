@@ -10,7 +10,7 @@
     <tbody>
     {{ range . }}
         <tr>
-            <td><a href="/memories/{{ .Id }}">{{ .Title }}</a></td>
+            <td><a href="/memories/{{ .ID }}">{{ .Title }}</a></td>
             <td>{{ .InsertedAt.Format "01/02/2006 03:04 pm" }}</td>
         </tr>
     {{ end }}
