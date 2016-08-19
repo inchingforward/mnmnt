@@ -91,7 +91,7 @@ func GetEditMemory(c echo.Context) error {
 		return c.Render(http.StatusNotFound, "404.html", nil)
 	}
 
-	return Render(c, "memory_form.html", memory, err)
+	return RenderContext(c, "memory_form.html", TemplateContext{memory, err})
 }
 
 // CreateMemory creates a new Memory using values from a submitted form.
