@@ -103,7 +103,7 @@ func CreateMemory(c echo.Context) error {
 
 	err := models.AddMemory(&m)
 	if err != nil {
-		return RenderContext(c, "memory_form.html", TemplateContext{c.FormParams(), err})
+		return RenderContext(c, "memory_form.html", TemplateContext{m, err})
 	}
 
 	utils.SendEmail(m)
