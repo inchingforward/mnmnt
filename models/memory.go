@@ -53,7 +53,7 @@ func NamedInsert(query string, arg interface{}) (uint64, error) {
 func GetRecentMemories() ([]*Memory, error) {
 	var memories []*Memory
 
-	err := DB.Select(&memories, "select * from memory where is_approved = true order by id desc limit 5")
+	err := DB.Select(&memories, "select * from memory where is_approved = true order by id desc limit 10")
 
 	return memories, err
 }
