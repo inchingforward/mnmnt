@@ -4,7 +4,13 @@ var RecentMemories = RecentMemories || (function() {
     function init() {
         var mapOptions = {
             center: { lat: 38.677811 , lng:  -90.419197 },
-            zoom: 13
+            zoom: 13,
+            zoomControl: true,
+            mapTypeControl: false,
+            scaleControl: false,
+            streetViewControl: false,
+            rotateControl: false,
+            fullscreenControl: false
         };
 
         infoWindow = new google.maps.InfoWindow();
@@ -70,7 +76,13 @@ var AddMemory = AddMemory || (function() {
     function init() {
         var mapOptions = {
             center: { lat: 38.6272222, lng: -90.1977778},
-            zoom: 13
+            zoom: 13,
+            zoomControl: true,
+            mapTypeControl: false,
+            scaleControl: false,
+            streetViewControl: false,
+            rotateControl: false,
+            fullscreenControl: false
         };
 
         map = new google.maps.Map(document.getElementById('address_search_map'), mapOptions);
@@ -164,8 +176,14 @@ var AddMemory = AddMemory || (function() {
 var MemoryDetails = MemoryDetails || (function() {
     function showMap(lat, lng, title) {
         var mapOptions = {
-          center: { lat: lat, lng: lng},
-          zoom: 13
+            center: { lat: lat, lng: lng},
+            zoom: 13,
+            zoomControl: true,
+            mapTypeControl: false,
+            scaleControl: false,
+            streetViewControl: false,
+            rotateControl: false,
+            fullscreenControl: false
         };
 
         var map = new google.maps.Map(document.getElementById("memory_map"), mapOptions);
