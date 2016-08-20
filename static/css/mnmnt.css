@@ -1,8 +1,9 @@
 html { 
   font-family: Georgia, serif; 
   line-height: 1.4em; 
-  color: #666; 
+  color: #555; 
   padding: 10px;
+  font-size: 18px;
 }
 
 header { margin-bottom: 10px; margin-top: 0; }
@@ -20,20 +21,8 @@ h5 { font-weight: 400; color: #ccc; }
 
 .error { color: #dd3333; }
 
-#index {
-	min-height: 400px;
-	display: flex;
-	display: -webkit-flex;
-	flex-flow: row;
-	-webkit-flex-flow: row;
-	align-items: stretch;
-	-webkit-align-items: stretch;
-	justify-content: center;
-	-webkit-justify-content: center;
-}
-
 #map {
-	height: 500px;
+	height: 200px;
 	border: 1px solid #ccc;
 	flex: 3 3 auto;
 	-webkit-flex: 3 3 auto;
@@ -42,23 +31,27 @@ h5 { font-weight: 400; color: #ccc; }
 }
 
 #map_memories {
-	flex: 1 1 auto;
-	-webkit-flex: 1 1 auto;
-	align-content: stretch;
-	-webkit-align-content: stretch;
+	display: flex;
+	display: -webkit-flex;
+	flex-flow: column;
+	-webkit-flex-flow: column;
+	align-items: stretch;
+	-webkit-align-items: stretch;
+	justify-content: center;
+	-webkit-justify-content: center;
 }
 
 #map_memories > ul {
   list-style: none;
   margin-left: 0;
-  padding-top: 0;
+  padding-top: 20px;
   padding-bottom: 0;
   margin-top: 0;
-  padding-left: 20px;
+  padding-left: 0;
 }
 
 #memory {
-  min-height: 400px;
+	min-height: 400px;
 	display: flex;
 	display: -webkit-flex;
 	flex-flow: column;
@@ -84,7 +77,7 @@ h5 { font-weight: 400; color: #ccc; }
 
 #info { width: 600px; margin: auto; }
 
-#all_memories { width: 600px; }
+#all_memories { width: 100% }
 #all_memories td,th { padding: 5px; }
 #all_memories th { text-align: left; }
 #all_memories th:nth-child(2), td:nth-child(2) {
