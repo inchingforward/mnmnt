@@ -21,6 +21,20 @@ type TemplateContext struct {
 	Err  error
 }
 
+// SetHandlers sets the memory handlers on the Echo instance.
+func SetHandlers(e *echo.Echo) {
+	e.Static("/static", "static")
+	e.GET("/", Index)
+	e.GET("/memories", GetMemories)
+	e.GET("/memories/:uuid/edit", GetEditMemory)
+	e.GET("/memories/:id", GetMemory)
+	e.POST("/memories", CreateMemory)
+	e.GET("/memories/submitted", GetMemorySubmitted)
+	e.GET("/memories/approve/:uuid", ApproveMemory)
+	e.GET("/memories/add", GetAddMemory)
+	e.GET("/about", GetAbout)
+}
+
 // MarkDownBasic passes the given data to the MarkdownBasic formatter.
 func MarkDownBasic(args ...interface{}) template.HTML {
 	s := blackfriday.MarkdownBasic([]byte(fmt.Sprintf("%s", args...)))

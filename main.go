@@ -66,16 +66,7 @@ func main() {
 
 	e.SetRenderer(t)
 
-	e.Static("/static", "static")
-	e.GET("/", handlers.Index)
-	e.GET("/memories", handlers.GetMemories)
-	e.GET("/memories/:uuid/edit", handlers.GetEditMemory)
-	e.GET("/memories/:id", handlers.GetMemory)
-	e.POST("/memories", handlers.CreateMemory)
-	e.GET("/memories/submitted", handlers.GetMemorySubmitted)
-	e.GET("/memories/approve/:uuid", handlers.ApproveMemory)
-	e.GET("/memories/add", handlers.GetAddMemory)
-	e.GET("/about", handlers.GetAbout)
+	handlers.SetHandlers(e)
 
 	log.Println("Listening...")
 	e.Run(standard.New(":4000"))
