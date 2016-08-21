@@ -177,6 +177,48 @@ var AddMemory = AddMemory || (function() {
     }
 })();
 
+var EditMemory = AddMemory || (function() {
+    var map, marker;
+
+    function init(latitude, longitude) {
+        var position = { lat: latitude, lng: longitude };
+
+        var mapOptions = {
+            center: position,
+            zoom: 13,
+            zoomControl: true,
+            mapTypeControl: false,
+            scaleControl: false,
+            streetViewControl: false,
+            rotateControl: false,
+            fullscreenControl: false,
+            styles: MAP_STYLES
+        };
+
+        map = new google.maps.Map(document.getElementById('edit_memory_map'), mapOptions);
+
+        marker = new google.maps.Marker({
+            map: map,
+            position: position
+        });
+    }
+
+    function verifyForm() {
+        var detailsField = $("#details");
+        if (!detailsField.val()) {
+            alert("Please enter some details.");
+            detailsField.focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    return {
+        init: init,
+    }
+})();
+
 var MemoryDetails = MemoryDetails || (function() {
     function showMap(lat, lng, title) {
         var mapOptions = {

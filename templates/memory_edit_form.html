@@ -1,0 +1,28 @@
+{{ template "layout_header.html" }}
+
+<div id="edit_memory">
+    <h2>Edit a memory </h2>
+
+    {{ if .Err }}
+        <h3 class="error">{{ .Err }}</h3>
+    {{ end }}
+
+    <form method="post" action="/memories/edit" onsubmit="return verifyForm();">
+        <input type="hidden" id="uuid" name="uuid" value="{{ if .Data }}{{ .Data.EditUUID }}{{ end }}" />
+        
+        <div id="edit_memory_map"></div>
+        
+        <h3>{{ .Data.Title }}</h2>
+        <h4>{{ .Data.Author }}</h3>
+        
+        <textarea id="details" name="details" placeholder="3. Enter your memory.  Separate paragraphs with a blank line.">{{ .Data.Details }}</textarea>
+        
+        <input type="submit" id="submit_button" value="Submit" />
+    </form>
+</div>
+
+{{ template "js.html" }}
+<script>
+EditMemory.init({{ .Data.Latitude }}, {{ .Data.Longitude }});
+</script>
+{{ template "layout_footer.html" }}

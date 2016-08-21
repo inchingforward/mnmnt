@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"html/template"
 	"io"
@@ -48,6 +49,7 @@ func Setup(e *echo.Echo, isDebug bool) {
 	e.GET("/", Index)
 	e.GET("/memories", GetMemories)
 	e.GET("/memories/:uuid/edit", GetEditMemory)
+	e.POST("/memories/edit", EditMemory)
 	e.GET("/memories/:id", GetMemory)
 	e.POST("/memories", CreateMemory)
 	e.GET("/memories/submitted", GetMemorySubmitted)
@@ -143,7 +145,7 @@ func GetEditMemory(c echo.Context) error {
 		return c.Render(http.StatusNotFound, "404.html", nil)
 	}
 
-	return RenderContext(c, "memory_form.html", TemplateContext{memory, err})
+	return RenderContext(c, "memory_edit_form.html", TemplateContext{memory, err})
 }
 
 // CreateMemory creates a new Memory using values from a submitted form.
@@ -162,6 +164,34 @@ func CreateMemory(c echo.Context) error {
 	utils.Tweet(m)
 
 	return Render(c, "memory_submitted.html", m, err)
+}
+
+// EditMemory updates the details of a previously saved memory.
+func EditMemory(c echo.Context) error {
+	uuid := c.FormValue("uuid")
+
+	if uuid == "" {
+		return RenderMessage(c, http.StatusBadRequest, fmt.Sprintf("Missing uuid"))
+	}
+
+	memory, err := models.GetMemoryByEditUUID(uuid)
+	if err == sql.ErrNoRows {
+		return c.Render(http.StatusNotFound, "404.html", nil)
+	}
+
+	details := c.FormValue("details")
+	if details == "" {
+		err = errors.New("Missing details")
+		return RenderContext(c, "memory_edit_form.html", TemplateContext{memory, err})
+	}
+	memory.Details = details
+
+	err = models.UpdateDetails(memory)
+	if err != nil {
+		return RenderContext(c, "memory_edit_form.html", TemplateContext{memory, err})
+	}
+
+	return Render(c, "memory_submitted.html", memory, err)
 }
 
 // GetMemorySubmitted renders the memory submitted success page.

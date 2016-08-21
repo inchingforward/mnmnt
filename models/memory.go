@@ -131,6 +131,13 @@ func AddMemory(memory *Memory) error {
 	return nil
 }
 
+// UpdateDetails updates the details and update date for the given memory.
+func UpdateDetails(memory Memory) error {
+	_, err := DB.NamedExec("update memory set details = :details, updated_at = now() where id = :id", memory)
+
+	return err
+}
+
 // ApproveMemory sets memory as approved.
 func ApproveMemory(memory Memory) error {
 	_, err := DB.NamedExec("update memory set is_approved = true where id = :id", memory)
