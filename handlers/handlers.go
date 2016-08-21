@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -21,8 +22,28 @@ type TemplateContext struct {
 	Err  error
 }
 
-// SetHandlers sets the memory handlers on the Echo instance.
-func SetHandlers(e *echo.Echo) {
+// Template represents the parsed templates from the "templates" directory.
+type Template struct {
+	templates *template.Template
+}
+
+var (
+	t     *Template
+	debug = false
+)
+
+// Setup sets the memory handlers and renderer on the Echo instance.
+func Setup(e *echo.Echo, isDebug bool) {
+	debug = isDebug
+
+	funcMap := template.FuncMap{
+		"mdb": MarkDownBasic,
+	}
+
+	t = &Template{
+		templates: template.Must(template.New("main").Funcs(funcMap).ParseGlob("templates/*.html")),
+	}
+
 	e.Static("/static", "static")
 	e.GET("/", Index)
 	e.GET("/memories", GetMemories)
@@ -33,12 +54,29 @@ func SetHandlers(e *echo.Echo) {
 	e.GET("/memories/approve/:uuid", ApproveMemory)
 	e.GET("/memories/add", GetAddMemory)
 	e.GET("/about", GetAbout)
+
+	e.SetRenderer(t)
 }
 
 // MarkDownBasic passes the given data to the MarkdownBasic formatter.
 func MarkDownBasic(args ...interface{}) template.HTML {
 	s := blackfriday.MarkdownBasic([]byte(fmt.Sprintf("%s", args...)))
 	return template.HTML(s)
+}
+
+// Render renders the template referenced by name and passes the data value
+// into the template.  If main was run with the debug argument, the templates
+// are re-parsed on each call to Render.
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	if debug {
+		funcMap := template.FuncMap{
+			"mdb": MarkDownBasic,
+		}
+
+		t.templates = template.Must(template.New("main").Funcs(funcMap).ParseGlob("templates/*.html"))
+	}
+
+	return t.templates.ExecuteTemplate(w, name, data)
 }
 
 // Render will render the given templ template passing in data if err
