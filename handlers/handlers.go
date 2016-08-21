@@ -163,7 +163,7 @@ func CreateMemory(c echo.Context) error {
 	utils.SendEmail(m)
 	utils.Tweet(m)
 
-	return Render(c, "memory_submitted.html", m, err)
+	return c.Redirect(http.StatusFound, "/memories/submitted")
 }
 
 // EditMemory updates the details of a previously saved memory.
@@ -191,7 +191,8 @@ func EditMemory(c echo.Context) error {
 		return RenderContext(c, "memory_edit_form.html", TemplateContext{memory, err})
 	}
 
-	return Render(c, "memory_submitted.html", memory, err)
+	url := fmt.Sprintf("/memories/%v", memory.ID)
+	return c.Redirect(http.StatusFound, url)
 }
 
 // GetMemorySubmitted renders the memory submitted success page.
