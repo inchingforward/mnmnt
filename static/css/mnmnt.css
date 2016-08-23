@@ -9,9 +9,9 @@ html {
 	margin-right: auto;
 }
 
-header { margin-bottom: 10px; margin-top: 0; }
-header a { margin-top: 0; margin-right: 10px; font-size: 1em;}
-.home { margin-right: 40px; }
+header { margin-bottom: 10px; margin-top: 0; display: flex; display: -webkit-flex; flex-direction: row; }
+header a { margin-top: 0; font-size: 1em; text-align: right; flex-grow: 6; -webkit-flex-grow: 6; align-self: flex-end; -webkit-align-self: flex-end; }
+.home { text-align: left; flex-grow: 80; -webkit-flex-grow: 70; }
 
 a:hover { text-decoration: underline; }
 
