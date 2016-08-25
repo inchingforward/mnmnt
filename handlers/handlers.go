@@ -127,7 +127,7 @@ func GetMemory(c echo.Context) error {
 		return RenderMessage(c, http.StatusBadRequest, fmt.Sprintf("Invalid id: '%v'", c.Param("id")))
 	}
 
-	memory, err := models.GetMemory(id)
+	memory, err := models.GetMemoryByID(id)
 
 	return Render(c, "memory.html", memory, err)
 }
@@ -208,7 +208,7 @@ func ApproveMemory(c echo.Context) error {
 		return c.Render(http.StatusBadRequest, "message.html", "Missing UUID")
 	}
 
-	memory, err := models.GetMemoryByUUID(uuid)
+	memory, err := models.GetMemoryByApprovalUUID(uuid)
 	if err != nil {
 		return Render(c, "", nil, err)
 	}

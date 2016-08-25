@@ -49,7 +49,7 @@ func NamedInsert(query string, arg interface{}) (uint64, error) {
 	return id, nil
 }
 
-// GetRecentMemories returns the 5 most recent memories.
+// GetRecentMemories returns the 5 most recent memories that are approved.
 func GetRecentMemories() ([]*Memory, error) {
 	var memories []*Memory
 
@@ -67,8 +67,9 @@ func GetAllMemories() ([]*Memory, error) {
 	return memories, err
 }
 
-// GetMemory returns an individual memory by Memory ID.
-func GetMemory(id int) (Memory, error) {
+// GetMemoryByID returns an individual memory by Memory ID.  The memory will not be returned
+// if it is not approved.
+func GetMemoryByID(id int) (Memory, error) {
 	memory := Memory{}
 
 	err := DB.Get(&memory, "select * from memory where id = $1 and is_approved = true", id)
@@ -76,7 +77,8 @@ func GetMemory(id int) (Memory, error) {
 	return memory, err
 }
 
-// GetMemoryByEditUUID returns an individual memory by its edit UUID.
+// GetMemoryByEditUUID returns an individual memory by its edit UUID.  The memory will
+// not be returned if it is not approved.
 func GetMemoryByEditUUID(uuid string) (Memory, error) {
 	memory := Memory{}
 
@@ -85,8 +87,9 @@ func GetMemoryByEditUUID(uuid string) (Memory, error) {
 	return memory, err
 }
 
-// GetMemoryByUUID returns an indiviual memory by its approval UUID.
-func GetMemoryByUUID(uuid string) (Memory, error) {
+// GetMemoryByApprovalUUID returns an indiviual memory by its approval UUID.  The memory must
+// not already be approved.
+func GetMemoryByApprovalUUID(uuid string) (Memory, error) {
 	memory := Memory{}
 
 	err := DB.Get(&memory, "select * from memory where is_approved = false and approval_uuid = $1", uuid)
