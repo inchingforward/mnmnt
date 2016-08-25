@@ -161,7 +161,6 @@ func CreateMemory(c echo.Context) error {
 	}
 
 	utils.SendEmail(m)
-	utils.Tweet(m)
 
 	return c.Redirect(http.StatusFound, "/memories/submitted")
 }
@@ -217,6 +216,8 @@ func ApproveMemory(c echo.Context) error {
 	if err != nil {
 		return Render(c, "", memory, err)
 	}
+
+	utils.Tweet(memory)
 
 	return Render(c, "memory_approved.html", memory, nil)
 }
