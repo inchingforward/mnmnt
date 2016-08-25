@@ -71,7 +71,7 @@ func GetAllMemories() ([]*Memory, error) {
 func GetMemory(id int) (Memory, error) {
 	memory := Memory{}
 
-	err := DB.Get(&memory, "select * from memory where id = $1", id)
+	err := DB.Get(&memory, "select * from memory where id = $1 and is_approved = true", id)
 
 	return memory, err
 }
