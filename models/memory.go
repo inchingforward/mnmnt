@@ -3,20 +3,25 @@ package models
 import (
 	"errors"
 	"log"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/satori/go.uuid"
 )
 
-// DB is the global reference to the database connection pool.
-var DB *sqlx.DB
+var (
+	DB *sqlx.DB
+	slugifyExpr = regexp.MustCompile("[^a-z0-9]+")
+)
 
 // A Memory represents a single memory that is tied to a location.
 type Memory struct {
 	ID           uint64    `db:"id" form:"id"`
 	AddressText  string    `db:"address_text" form:"address_text"`
 	Title        string    `db:"title" form:"title"`
+	Slug         string    `db:"slug"`
 	Details      string    `db:"details" form:"details"`
 	Latitude     float64   `db:"latitude" form:"latitude"`
 	Longitude    float64   `db:"longitude" form:"longitude"`
@@ -121,6 +126,7 @@ func AddMemory(memory *Memory) error {
 
 	memory.ApprovalUUID = uuid.NewV4().String()
 	memory.EditUUID = uuid.NewV4().String()
+	memory.Slug = slugify(memory.Title)
 
 	id, err := NamedInsert("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now(), :edit_uuid, :address_text) returning id", memory)
 	if err != nil {
@@ -146,4 +152,10 @@ func ApproveMemory(memory Memory) error {
 	_, err := DB.NamedExec("update memory set is_approved = true where id = :id", memory)
 
 	return err
+}
+
+func slugify(str string) string {
+	// FIXME: check the database for duplicates, consider passing in the memory 
+	// and setting the value on the memory
+    return strings.Trim(slugifyExpr.ReplaceAllString(strings.ToLower(str), "-"), "-")
 }
