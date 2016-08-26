@@ -29,6 +29,7 @@ var slugifyTests = []struct {
 	{"HelLo WoRlD", "hello-world"},
 	{"  hello world  ", "hello-world"},
 	{"!@#$%^&*()_+=`~,./?><;:'\"[]{}\\|hello world", "hello-world"},
+	{"123456789012345678901234567890123456789012345678901", "12345678901234567890123456789012345678901234567890"},
 }
 
 func TestSlugify(t *testing.T) {

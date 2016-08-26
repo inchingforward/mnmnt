@@ -157,5 +157,9 @@ func ApproveMemory(memory Memory) error {
 func slugify(str string) string {
 	// FIXME: check the database for duplicates, consider passing in the memory 
 	// and setting the value on the memory
+	if len(str) > 50 {
+		str = str[0:50]
+	}
+	
     return strings.Trim(slugifyExpr.ReplaceAllString(strings.ToLower(str), "-"), "-")
 }
