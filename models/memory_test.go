@@ -19,3 +19,22 @@ func TestMemoryRequiresTitle(t *testing.T) {
 		}
 	}
 }
+
+var slugifyTests = []struct {
+	before string
+	after  string
+}{
+	{"hello world", "hello-world"},
+	{"-hello world-", "hello-world"},
+	{"HelLo WoRlD", "hello-world"},
+	{"!@#$%^&*()_+=`~,./?><;:'\"[]{}\\|hello world", "hello-world"},
+}
+
+func TestSlugify(t *testing.T) {
+	for _, pair := range slugifyTests {
+		result := slugify(pair.before)
+		if result != pair.after {
+			t.Errorf("expected %s, got %s\n", pair.after, result)
+		}
+	}
+}
