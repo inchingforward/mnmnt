@@ -27,6 +27,7 @@ var slugifyTests = []struct {
 	{"hello world", "hello-world"},
 	{"-hello world-", "hello-world"},
 	{"HelLo WoRlD", "hello-world"},
+	{"  hello world  ", "hello-world"},
 	{"!@#$%^&*()_+=`~,./?><;:'\"[]{}\\|hello world", "hello-world"},
 }
 
