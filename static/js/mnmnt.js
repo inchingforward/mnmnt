@@ -35,7 +35,7 @@ var RecentMemories = RecentMemories || (function() {
 
         marker.addListener("mouseover", function() {
             var that = this;
-            showInfoWindowForId(memoryId);
+            showInfoWindowForMemory(memoryId);
         });
 
         cacheMarkerAndContent(memoryId, marker, memoryTitle);
@@ -50,7 +50,7 @@ var RecentMemories = RecentMemories || (function() {
         }
     }
 
-    function showInfoWindowForId(memoryId) {
+    function showInfoWindowForMemory(memoryId) {
         var mc = markerAndContent[memoryId];
         var content = '<a href="/memories/' + memoryId + '">' + mc.content + '</a>'
 
@@ -59,7 +59,7 @@ var RecentMemories = RecentMemories || (function() {
     }
 
     return {
-        showInfoWindowForId: showInfoWindowForId,
+        showInfoWindowForMemory: showInfoWindowForMemory,
         addMemory: addMemory, 
         init: init
     }

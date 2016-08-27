@@ -8,7 +8,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/inchingforward/mnmnt/models"
 	"github.com/inchingforward/mnmnt/utils"
@@ -50,7 +49,7 @@ func Setup(e *echo.Echo, isDebug bool) {
 	e.GET("/memories", GetMemories)
 	e.GET("/memories/:uuid/edit", GetEditMemory)
 	e.POST("/memories/edit", EditMemory)
-	e.GET("/memories/:id", GetMemory)
+	e.GET("/memories/:slug", GetMemory)
 	e.POST("/memories", CreateMemory)
 	e.GET("/memories/submitted", GetMemorySubmitted)
 	e.GET("/memories/approve/:uuid", ApproveMemory)
@@ -122,12 +121,9 @@ func GetMemories(c echo.Context) error {
 // GetMemory renders the memory details page for the corresponding
 // memory id parameter.
 func GetMemory(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return RenderMessage(c, http.StatusBadRequest, fmt.Sprintf("Invalid id: '%v'", c.Param("id")))
-	}
+	slug := c.Param("slug")
 
-	memory, err := models.GetMemoryByID(id)
+	memory, err := models.GetMemory(slug)
 
 	return Render(c, "memory.html", memory, err)
 }

@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"regexp"
 	"strings"
@@ -12,7 +13,7 @@ import (
 )
 
 var (
-	DB *sqlx.DB
+	DB          *sqlx.DB
 	slugifyExpr = regexp.MustCompile("[^a-z0-9]+")
 )
 
@@ -72,12 +73,12 @@ func GetAllMemories() ([]*Memory, error) {
 	return memories, err
 }
 
-// GetMemoryByID returns an individual memory by Memory ID.  The memory will not be returned
-// if it is not approved.
-func GetMemoryByID(id int) (Memory, error) {
+// GetMemory returns an individual memory by slug.  The memory will not be returned if
+// it has not been approved.
+func GetMemory(slug string) (Memory, error) {
 	memory := Memory{}
 
-	err := DB.Get(&memory, "select * from memory where id = $1 and is_approved = true", id)
+	err := DB.Get(&memory, "select * from memory where slug = $1 and is_approved = true", slug)
 
 	return memory, err
 }
@@ -126,9 +127,15 @@ func AddMemory(memory *Memory) error {
 
 	memory.ApprovalUUID = uuid.NewV4().String()
 	memory.EditUUID = uuid.NewV4().String()
-	memory.Slug = slugify(memory.Title)
 
-	id, err := NamedInsert("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now(), :edit_uuid, :address_text) returning id", memory)
+	slug, err := generateSlug(memory.Title)
+	if err != nil {
+		return err
+	}
+
+	memory.Slug = slug
+
+	id, err := NamedInsert("insert into memory values (default, :title, :details, :latitude, :longitude, :author, false, :approval_uuid, now(), now(), :edit_uuid, :address_text, :slug) returning id", memory)
 	if err != nil {
 		return err
 	}
@@ -138,6 +145,47 @@ func AddMemory(memory *Memory) error {
 	log.Printf("New memory \"%v\" (id: %v) created.\n", memory.Title, memory.ID)
 
 	return nil
+}
+
+// GetSlugCount returns the number of times the given slug appears
+// in the memory table.
+func GetSlugCount(slug string) (int, error) {
+	var count int
+	err := DB.Get(&count, "select count(*) from memory where slug = $1", slug)
+
+	return count, err
+}
+
+func generateSlug(title string) (string, error) {
+	slug := slugify(title)
+
+	count, err := GetSlugCount(slug)
+	if err != nil {
+		return "", err
+	}
+
+	if count == 0 {
+		return slug, nil
+	}
+
+	for i := 2; i <= 50; i++ {
+		currSlug := fmt.Sprintf("%v-%v", slug, i)
+		count, err = GetSlugCount(currSlug)
+
+		if err != nil {
+			return "", err
+		}
+
+		if count == 0 {
+			return currSlug, nil
+		}
+	}
+
+	return "", errors.New("Unable to create a valid slug")
+}
+
+func slugify(str string) string {
+	return strings.Trim(slugifyExpr.ReplaceAllString(strings.ToLower(str), "-"), "-")
 }
 
 // UpdateDetails updates the details and update date for the given memory.
@@ -155,8 +203,6 @@ func ApproveMemory(memory Memory) error {
 }
 
 func slugify(str string) string {
-	// FIXME: check the database for duplicates, consider passing in the memory 
-	// and setting the value on the memory
 	if len(str) > 50 {
 		str = str[0:50]
 	}

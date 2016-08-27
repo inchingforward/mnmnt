@@ -4,7 +4,7 @@
     <div id="map_memories">
     	<ul>
     	{{ range . }}
-    		<li><a href="/memories/{{ .ID }}" onmouseover="RecentMemories.showInfoWindowForId({{ .ID }});">{{ .Title }}</a></li>
+    		<li><a href="/memories/{{ .Slug }}" onmouseover="RecentMemories.showInfoWindowForMemory('{{ .Slug }}');">{{ .Title }}</a></li>
     	{{ end }}
     	</ul>
     </div>
@@ -14,7 +14,7 @@
 <script>
     RecentMemories.init();
 {{ range . }}
-    RecentMemories.addMemory({{ .Latitude }}, {{ .Longitude }}, "{{ .ID }}", "{{ .Title }}");
+    RecentMemories.addMemory({{ .Latitude }}, {{ .Longitude }}, "{{ .Slug }}", "{{ .Title }}");
 {{ end }}
 </script>
 {{ template "layout_footer.html" }}
