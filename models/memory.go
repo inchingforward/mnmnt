@@ -184,10 +184,6 @@ func generateSlug(title string) (string, error) {
 	return "", errors.New("Unable to create a valid slug")
 }
 
-func slugify(str string) string {
-	return strings.Trim(slugifyExpr.ReplaceAllString(strings.ToLower(str), "-"), "-")
-}
-
 // UpdateDetails updates the details and update date for the given memory.
 func UpdateDetails(memory Memory) error {
 	_, err := DB.NamedExec("update memory set details = :details, updated_at = now() where id = :id", memory)
@@ -206,6 +202,6 @@ func slugify(str string) string {
 	if len(str) > 50 {
 		str = str[0:50]
 	}
-	
-    return strings.Trim(slugifyExpr.ReplaceAllString(strings.ToLower(str), "-"), "-")
+
+	return strings.Trim(slugifyExpr.ReplaceAllString(strings.ToLower(str), "-"), "-")
 }
