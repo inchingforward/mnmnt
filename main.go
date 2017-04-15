@@ -8,7 +8,6 @@ import (
 	"github.com/inchingforward/mnmnt/models"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/engine/standard"
 	_ "github.com/lib/pq"
 )
 
@@ -33,5 +32,5 @@ func main() {
 	handlers.Setup(e, debug)
 
 	log.Println("Listening...")
-	e.Run(standard.New(":4000"))
+	e.Logger.Fatal(e.Start(":4000"))
 }

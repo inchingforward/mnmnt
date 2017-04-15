@@ -56,7 +56,7 @@ func Setup(e *echo.Echo, isDebug bool) {
 	e.GET("/memories/add", GetAddMemory)
 	e.GET("/about", GetAbout)
 
-	e.SetRenderer(t)
+	e.Renderer = t
 }
 
 // MarkDownBasic passes the given data to the MarkdownBasic formatter.
