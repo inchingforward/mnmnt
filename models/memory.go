@@ -127,8 +127,20 @@ func AddMemory(memory *Memory) error {
 		memory.Author = "Anonymous"
 	}
 
-	memory.ApprovalUUID = uuid.NewV4().String()
-	memory.EditUUID = uuid.NewV4().String()
+
+    approvalUUID, err := uuid.NewV4()
+    if err != nil {
+        return err
+    }
+
+    memory.ApprovalUUID = approvalUUID.String()
+
+    editUUID, err := uuid.NewV4()
+    if err != nil {
+        return err
+    }
+
+    memory.EditUUID = editUUID.String()
 
 	slug, err := generateSlug(memory.Title)
 	if err != nil {
