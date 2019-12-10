@@ -8,6 +8,7 @@
     {{ end }}
 
     <form method="post" action="/memories" onsubmit="return verifyForm();">
+        <div id="geocoder" class="geocoder"></div>
         <div id="address_search">
           <input type="text" id="address_text" name="address_text" value="{{ if .Data }}{{ .Data.AddressText }}{{ end }}" placeholder="1. Search for a place or address." onenter="findAddress();" />
           <div id="address_search_map"></div>

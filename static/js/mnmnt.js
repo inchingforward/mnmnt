@@ -55,7 +55,7 @@ var RecentMemories = RecentMemories || (function() {
 })();
 
 var AddMemory = AddMemory || (function() {
-    var map, marker;
+    var map, marker, geocoder;
 
     var delay = function() {
         var timeout = 0;
@@ -66,29 +66,39 @@ var AddMemory = AddMemory || (function() {
     }();
 
     function init() {
-        var mapOptions = {
-            center: { lat: 38.6272222, lng: -90.1977778},
-            zoom: 13,
-            zoomControl: true,
-            mapTypeControl: false,
-            scaleControl: false,
-            streetViewControl: false,
-            rotateControl: false,
-            fullscreenControl: false,
-            styles: MAP_STYLES
-        };
-
-        map = new google.maps.Map(document.getElementById('address_search_map'), mapOptions);
-
-        $("#address_text").keyup(function() {
-            delay(findAddress, 1500);
+        map = new mapboxgl.Map({
+            container: 'address_search_map',
+            style: 'mapbox://styles/mapbox/light-v10',
+            center: [-90.1994, 38.6270],
+            zoom: 13
         });
 
-        $("#address_text").keypress(function (e) {
-            if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
-                findAddress();
-            }
+        geocoder = new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            mapboxgl: mapboxgl,
+            placeholder: "1. Search for a place or address" 
         });
+
+        document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+        
+        // $("#address_text").keyup(function() {
+        //     delay(findAddress, 1500);
+        // });
+
+        // $("#address_text").keypress(function (e) {
+        //     if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
+        //         findAddress();
+        //     }
+        // });
+
+        // geocoder = new MapboxGeocoder({ accessToken: mapboxgl.accessToken });
+        geocoder.on('result', function(result) {
+            console.log(result);
+            console.log(result.result.center);
+        });
+
+        console.log(geocoder);
+        console.log(geocoder.query);
     }
 
     function findAddress() {
@@ -102,35 +112,42 @@ var AddMemory = AddMemory || (function() {
             marker.setMap(null);
         }
 
-        var latitude = $("#latitude");
-        var longitude = $("#longitude");
-        var submitButton = $("#submit_button");
-        var geocoder = new google.maps.Geocoder();
+        console.log(geocoder);
+        console.log("gonna query...")
+        //geocoder.query(addressText);
+        geocoder._geocode(addressText);
+        console.log("queried");
 
-        $("#map_spinner").show();
+        // var latitude = $("#latitude");
+        // var longitude = $("#longitude");
+        // var submitButton = $("#submit_button");
+        // var geocoder = new google.maps.Geocoder();
 
-        geocoder.geocode({address: addressText}, function(results, status) {
-            $("#map_spinner").hide();
+        // $("#map_spinner").show();
 
-            if (status == google.maps.GeocoderStatus.OK) {
-                map.setCenter(results[0].geometry.location);
 
-                marker = new google.maps.Marker({
-                    map: map,
-                    position: results[0].geometry.location
-                });
+        // geocoder.geocode({address: addressText}, function(results, status) {
+        //     $("#map_spinner").hide();
 
-                latitude.val(results[0].geometry.location.lat());
-                longitude.val(results[0].geometry.location.lng());
+        //     if (status == google.maps.GeocoderStatus.OK) {
+        //         map.setCenter(results[0].geometry.location);
 
-                submitButton.attr("disabled", false);
-            } else {
-                latitude.val("");
-                longitude.val("");
+        //         marker = new google.maps.Marker({
+        //             map: map,
+        //             position: results[0].geometry.location
+        //         });
 
-                submitButton.attr("disabled", "disabled");
-            }
-        });
+        //         latitude.val(results[0].geometry.location.lat());
+        //         longitude.val(results[0].geometry.location.lng());
+
+        //         submitButton.attr("disabled", false);
+        //     } else {
+        //         latitude.val("");
+        //         longitude.val("");
+
+        //         submitButton.attr("disabled", "disabled");
+        //     }
+        // });
     }
 
     function verifyForm() {
@@ -170,26 +187,18 @@ var EditMemory = AddMemory || (function() {
     var map, marker;
 
     function init(latitude, longitude) {
-        var position = { lat: latitude, lng: longitude };
+        var lngLat = [lng, lat];
 
-        var mapOptions = {
-            center: position,
+        var map = new mapboxgl.Map({
+            container: 'edit_memory_map',
+            style: 'mapbox://styles/mapbox/light-v10',
             zoom: 13,
-            zoomControl: true,
-            mapTypeControl: false,
-            scaleControl: false,
-            streetViewControl: false,
-            rotateControl: false,
-            fullscreenControl: false,
-            styles: MAP_STYLES
-        };
-
-        map = new google.maps.Map(document.getElementById('edit_memory_map'), mapOptions);
-
-        marker = new google.maps.Marker({
-            map: map,
-            position: position
+            center: lngLat
         });
+        
+        var marker = new mapboxgl.Marker()
+            .setLngLat(lngLat)
+            .addTo(map);
     }
 
     function verifyForm() {
@@ -210,25 +219,18 @@ var EditMemory = AddMemory || (function() {
 
 var MemoryDetails = MemoryDetails || (function() {
     function showMap(lat, lng, title) {
-        var mapOptions = {
-            center: { lat: lat, lng: lng},
+        var lngLat = [lng, lat];
+
+        var map = new mapboxgl.Map({
+            container: 'memory_map',
+            style: 'mapbox://styles/mapbox/light-v10',
             zoom: 13,
-            zoomControl: true,
-            mapTypeControl: false,
-            scaleControl: false,
-            streetViewControl: false,
-            rotateControl: false,
-            fullscreenControl: false,
-            styles: MAP_STYLES
-        };
-
-        var map = new google.maps.Map(document.getElementById("memory_map"), mapOptions);
-
-        new google.maps.Marker({
-            position: {lat: lat, lng: lng}, 
-            map: map, 
-            title: title
+            center: lngLat
         });
+        
+        var marker = new mapboxgl.Marker()
+            .setLngLat(lngLat)
+            .addTo(map);
     }
 
     return {

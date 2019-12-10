@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/inchingforward/mnmnt/models"
 	"github.com/mailgun/mailgun-go"
@@ -29,9 +31,12 @@ func SendEmail(memory models.Memory) {
 	subject := "New Monument memory submitted"
 	body := fmt.Sprintf("%v:\n\n%v\n\n-%v\n\nApproval link: %v", memory.Title, memory.Details, memory.Author, approvalLink)
 
-	gun := mailgun.NewMailgun(domain, prvKey, pubKey)
-	msg := mailgun.NewMessage(address, subject, body, address)
+	gun := mailgun.NewMailgun(domain, prvKey)
+	msg := gun.NewMessage(address, subject, body, address)
 
-	response, id, err := gun.Send(msg)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	response, id, err := gun.Send(ctx, msg)
 	log.Printf("mailer response: %v, message: %v, error: %v\n", id, response, err)
 }
