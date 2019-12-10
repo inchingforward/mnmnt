@@ -1,61 +1,50 @@
-var MAP_STYLES = [{"featureType":"landscape","stylers":[{"hue":"#FFBB00"},{"saturation":43.400000000000006},{"lightness":37.599999999999994},{"gamma":1}]},{"featureType":"road.highway","stylers":[{"hue":"#FFC200"},{"saturation":-61.8},{"lightness":45.599999999999994},{"gamma":1}]},{"featureType":"road.arterial","stylers":[{"hue":"#FF0300"},{"saturation":-100},{"lightness":51.19999999999999},{"gamma":1}]},{"featureType":"road.local","stylers":[{"hue":"#FF0300"},{"saturation":-100},{"lightness":52},{"gamma":1}]},{"featureType":"water","stylers":[{"hue":"#0078FF"},{"saturation":-13.200000000000003},{"lightness":2.4000000000000057},{"gamma":1}]},{"featureType":"poi","stylers":[{"hue":"#00FF6A"},{"saturation":-1.0989010989011234},{"lightness":11.200000000000017},{"gamma":1}]}];
-
 var RecentMemories = RecentMemories || (function() {
-    var infoWindow, map, bounds, markerAndContent;
+    var infoWindow, map, bounds, markers, prevMarker;
+    
+    mapboxgl.accessToken = 'pk.eyJ1IjoibWphbmdlciIsImEiOiJjazN6NHZlNHkwMjZiM2tudzRpN3FyNzc0In0.avUDs9ardvviib8L8HsMSA';
     
     function init() {
-        var mapOptions = {
-            center: { lat: 38.677811 , lng:  -90.419197 },
-            zoom: 13,
-            zoomControl: true,
-            mapTypeControl: false,
-            scaleControl: false,
-            streetViewControl: false,
-            rotateControl: false,
-            fullscreenControl: false,
-            styles: MAP_STYLES
-        };
+        var center = [-90.419197, 38.677811];
 
-        infoWindow = new google.maps.InfoWindow();
-        map = new google.maps.Map(document.getElementById("map"), mapOptions);
-        bounds = new google.maps.LatLngBounds();
-        markerAndContent = {};
+        map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v10',
+            zoom: 13,
+            center: center
+        });
+        
+        bounds = new mapboxgl.LngLatBounds();
+        markers = {};
     }
 
     function addMemory(latitude, longitude, memoryId, memoryTitle) {
-        var latLng = new google.maps.LatLng(latitude, longitude);
+        var lngLat = [longitude, latitude];
 
-        bounds.extend(latLng);
+        var popup = new mapboxgl.Popup({closeButton: false})
+            .setLngLat(lngLat)
+            .setHTML('<a href="/memories/' + memoryId + '">' + memoryTitle + '</a>')
+            .setMaxWidth("300px");
+        
+        var marker = new mapboxgl.Marker()
+            .setLngLat(lngLat)
+            .addTo(map)
+            .setPopup(popup);
+        
+        bounds.extend(lngLat);
+        map.fitBounds(bounds, {padding: 30});
 
-        var marker = new google.maps.Marker({
-            position: latLng,
-            map: map,
-            title: memoryTitle
-        });
-
-        marker.addListener("mouseover", function() {
-            var that = this;
-            showInfoWindowForMemory(memoryId);
-        });
-
-        cacheMarkerAndContent(memoryId, marker, memoryTitle);
-
-        map.fitBounds(bounds);        
-    }
-
-    function cacheMarkerAndContent(memoryId, marker, content) {
-        markerAndContent[memoryId] = {
-            marker: marker,
-            content: content
-        }
+        markers[memoryId] = marker;
     }
 
     function showInfoWindowForMemory(memoryId) {
-        var mc = markerAndContent[memoryId];
-        var content = '<a href="/memories/' + memoryId + '">' + mc.content + '</a>'
+        var marker = markers[memoryId];
+        marker.togglePopup();
 
-        infoWindow.setContent(content);
-        infoWindow.open(map, mc.marker);
+        if (prevMarker) {
+            prevMarker.togglePopup();
+        }
+
+        prevMarker = marker;
     }
 
     return {
