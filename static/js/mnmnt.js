@@ -1,39 +1,22 @@
-var API_KEY = 'VH-NAclLOgOGa9AKWvrMO9ttZHkTDKL71nxUf2jL7bM';
+var API_KEY = 'pk.eyJ1IjoibWphbmdlciIsImEiOiJjazN6NHZlNHkwMjZiM2tudzRpN3FyNzc0In0.avUDs9ardvviib8L8HsMSA';
+var tileLayer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 18,
+    //id: 'mapbox/streets-v11',
+    id: 'mapbox/light-v10',
+    tileSize: 512,
+    zoomOffset: -1,
+    accessToken: API_KEY
+});
 
 var RecentMemories = RecentMemories || (function() {
     var infoWindow, map, bounds, markers, prevMarker, group, ui;    
         
     function init() {
-        var center = { lat: 38.677811, lng: -90.419197 };
+        map = L.map('map').setView([38.677811, -90.419197], 13);
 
-        var platform = new H.service.Platform({
-            'apikey': API_KEY
-        });
-    
-        var defaultLayers = platform.createDefaultLayers();
-    
-        map = new H.Map(
-            document.getElementById('map'),
-            defaultLayers.vector.normal.map, 
-            {
-                zoom: 13,
-                center: center,
-                pixelRatio: window.devicePixelRatio || 1,
-                padding: {top: 15, right: 15, bottom: 15, left: 15}
-            }
-        );
-
-        var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
-        ui = H.ui.UI.createDefault(map, defaultLayers);
-
-        group = new H.map.Group();
-
-        map.addObject(group);
-
-        group.addEventListener('tap', function (evt) {
-            showMarkerBubble(evt.target);
-        }, false);
-
+        tileLayer.addTo(map);
+        
         markers = {};
     }
 
@@ -51,20 +34,24 @@ var RecentMemories = RecentMemories || (function() {
     }
 
     function addMemory(latitude, longitude, memoryId, memoryTitle) {
-        var marker = new H.map.Marker({lat: latitude, lng: longitude});
-        marker.setData('<a href="/memories/' + memoryId + '">' + memoryTitle + '</a>');
-        group.addObject(marker);
-        
-        map.getViewModel().setLookAtData({
-             bounds: group.getBoundingBox()
-        });
+        var marker = L.marker([latitude, longitude]);
+        marker.bindPopup('<a href="/memories/' + memoryId + '">' + memoryTitle + '</a>');
+        marker.addTo(map);
 
         markers[memoryId] = marker;
+
+        if (!bounds) {
+            bounds = new L.LatLngBounds(); 
+        }
+
+        bounds.extend(marker.getLatLng());
+
+        map.fitBounds(bounds);
     }
 
     function showInfoWindowForMemory(memoryId) {
         var marker = markers[memoryId];
-        showMarkerBubble(marker);
+        marker.openPopup();
     }
 
     return {
@@ -239,29 +226,11 @@ var EditMemory = AddMemory || (function() {
 
 var MemoryDetails = MemoryDetails || (function() {
     function showMap(lat, lng, title) {
-        var latLng = {lat: lat, lng: lng};
-        var platform = new H.service.Platform({
-            'apikey': API_KEY
-        });
-    
-        var defaultLayers = platform.createDefaultLayers();
-    
-        map = new H.Map(
-            document.getElementById('memory_map'),
-            defaultLayers.vector.normal.map, 
-            {
-                zoom: 13,
-                center: latLng,
-                pixelRatio: window.devicePixelRatio || 1,
-                padding: {top: 15, right: 15, bottom: 15, left: 15}
-            }
-        );
+        map = L.map('memory_map').setView([lat, lng], 13);
 
-        var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
-        ui = H.ui.UI.createDefault(map, defaultLayers);
+        tileLayer.addTo(map);
         
-        var marker = new H.map.Marker(latLng);
-        map.addObject(marker);
+        L.marker([lat, lng]).addTo(map);
     }
 
     return {
