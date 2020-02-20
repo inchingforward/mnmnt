@@ -62,99 +62,36 @@ var RecentMemories = RecentMemories || (function() {
 })();
 
 var AddMemory = AddMemory || (function() {
-    var map, marker, geocoder;
+    var map, marker;
 
-    var delay = function() {
-        var timeout = 0;
-        return function(callback, ms) {
-            clearTimeout(timeout);
-            timeout = setTimeout(callback, ms);
-        };
-    }();
-
-    function init() {
-        map = new mapboxgl.Map({
-            container: 'address_search_map',
-            style: 'mapbox://styles/mapbox/light-v10',
-            center: [-90.1994, 38.6270],
-            zoom: 13
-        });
-
-        geocoder = new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            mapboxgl: mapboxgl,
-            placeholder: "1. Search for a place or address" 
-        });
-
-        //document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+    function mapClicked(e) {
+        if (!marker) {
+            marker = L.marker(e.latlng);
+            marker.addTo(map)
+        }
         
-        $("#address_text").keyup(function() {
-            delay(findAddress, 1500);
-        });
-
-        $("#address_text").keypress(function (e) {
-            if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
-                findAddress();
-            }
-        });
-
-        // geocoder = new MapboxGeocoder({ accessToken: mapboxgl.accessToken });
-        geocoder.on('result', function(result) {
-            console.log(result);
-            console.log(result.result.center);
-        });
-
-        console.log(geocoder);
-        console.log(geocoder.query);
+        marker.setLatLng(e.latlng);
+        
+        $("#latitude").val(e.latlng.lat);
+        $("#longitude").val(e.latlng.lng);
     }
 
     function findAddress() {
-        var addressText = $("#address_text").val();
-        if (!addressText) {
-            alert("Please enter an address to search for.");
-            return;
+        var latitude = $("#latitude").val();
+        var longitude = $("#longitude").val();
+
+        if (latitude && longitude) {
+            marker = L.marker([latitude, longitude]);
+            marker.addTo(map)
         }
+    }
 
-        if (marker) {
-            marker.setMap(null);
-        }
+    function init() {
+        map = L.map('address_search_map').setView([38.6270, -90.1994], 4);
 
-        console.log("gonna query...")
-        //geocoder.query(addressText);
-        //geocoder.inputString = addressText;
-        geocoder._geocode(addressText);
-        console.log("queried");
+        tileLayer.addTo(map);
 
-        // var latitude = $("#latitude");
-        // var longitude = $("#longitude");
-        // var submitButton = $("#submit_button");
-        // var geocoder = new google.maps.Geocoder();
-
-        // $("#map_spinner").show();
-
-
-        // geocoder.geocode({address: addressText}, function(results, status) {
-        //     $("#map_spinner").hide();
-
-        //     if (status == google.maps.GeocoderStatus.OK) {
-        //         map.setCenter(results[0].geometry.location);
-
-        //         marker = new google.maps.Marker({
-        //             map: map,
-        //             position: results[0].geometry.location
-        //         });
-
-        //         latitude.val(results[0].geometry.location.lat());
-        //         longitude.val(results[0].geometry.location.lng());
-
-        //         submitButton.attr("disabled", false);
-        //     } else {
-        //         latitude.val("");
-        //         longitude.val("");
-
-        //         submitButton.attr("disabled", "disabled");
-        //     }
-        // });
+        map.on('click', mapClicked);
     }
 
     function verifyForm() {
@@ -162,8 +99,7 @@ var AddMemory = AddMemory || (function() {
         var longitude = $("#longitude").val();
 
         if (!latitude || !longitude) {
-            alert("Please search and find an address.");
-            $("#address_text").focus();
+            alert("Please pick a location on the map.");
             return false;
         }
 
@@ -226,7 +162,7 @@ var EditMemory = AddMemory || (function() {
 
 var MemoryDetails = MemoryDetails || (function() {
     function showMap(lat, lng, title) {
-        map = L.map('memory_map').setView([lat, lng], 13);
+        var map = L.map('memory_map').setView([lat, lng], 13);
 
         tileLayer.addTo(map);
         
